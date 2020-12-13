@@ -1,0 +1,298 @@
+package com.johnsonautoparts.servlet;
+
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.sql.Connection;
+import java.util.Map;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.johnsonautoparts.Project;
+import com.johnsonautoparts.ProjectCaller;
+import com.johnsonautoparts.db.DB;
+import com.johnsonautoparts.exception.AppException;
+import com.johnsonautoparts.exception.DBException;
+import com.johnsonautoparts.logger.AppLogger;
+
+
+/**
+ * Servlet Class registered via the web.xml as the primary class for handling
+ * calls for the webapp. The doGet() and doPost() are called in Tomcat and
+ * registerd as the handlers in this class.
+ * 
+ */
+public class ServletHandler extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+  	private String project=null;
+  	private String task=null;
+  	private String paramType=null;
+  	private Map<String,String[]> params;
+
+  	/**
+  	 * @see HttpServlet#HttpServlet()
+  	 */
+  	public ServletHandler() {
+  		super();
+  	}
+  	
+  			
+  	/**
+  	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+  	 */
+  	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+ 		String responseHtml="<html><body>All Good</body></html>";
+  		
+ 		/**
+ 		 * Make sure everything is good before proceeding
+ 		 */
+ 		if(! isRequestValid(request, response) ) {
+ 			return;
+ 		}
+ 		
+ 		
+ 		//main logic to parse action
+  		try {
+  			// get a connection to the database
+  			Connection connection = DB.getDbConnection(request.getSession());
+
+  			//minimize code by using reflection to discover classes and methods
+			Project projectClass = getProjectClass(project, connection, request);
+			Method method = getProjectMethod(projectClass.getClass());
+			//ProjectCaller projectCaller = getProjectCaller(project, connection, request);
+
+			try {
+				String[] paramStr=params.get("param1");
+				if( (paramStr==null) || (paramStr[0]==null) || (paramStr[0].trim().isEmpty())) {
+					throw new AppException("param 1 is empty", "account id incorrect");
+				}
+					
+				
+				if(paramType.equals("String")) {					
+					String param1 = params.get("param1")[0];
+
+					method.invoke(projectClass, param1);					
+				}
+				
+
+				else if(paramType.equals("Integer")) {
+					int param1 = Integer.parseInt(params.get("param1")[0]);
+										
+					method.invoke(projectClass, param1);
+				}
+				
+				else {
+					throw new AppException("Cannot parse paramtype and invoke method", "application error");
+				}
+				
+			}
+			catch(NumberFormatException nfe) {
+				throw new AppException("param sent was not a number", "parameter error");
+			}
+			catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException iiie) {
+				throw new AppException("caught class exception error: " + iiie.getMessage(), "application error");
+			}
+  			
+  			//send successful response
+  			response.setContentType("text/html");
+  			PrintWriter out = response.getWriter();
+  			out.println(responseHtml);
+  		}
+  		
+  		/**
+  		 * Database exception errors are caught
+  		 * Full message is logged but a general error is sent to the request
+  		 */
+  		catch (DBException dbe) {
+  			AppLogger.log("DB error: " + dbe.getMessage());
+  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+  			ServletUtilities.sendError(response, "application error");
+  			return;
+  		}
+  		
+  		/**
+  		 * Application exception errors are caught
+  		 * Private message is logged and the public message is returned to the request
+  		 */
+  		catch (AppException ae) {
+  			AppLogger.log("AppException: " + ae.getPrivateMessage());
+  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+  			ServletUtilities.sendError(response, ae.getMessage());
+  			return;
+  		}
+  		
+  		// Use finally to close the database connection
+  		finally {
+  			try {
+  				DB.closeDbConnection(request.getSession());
+  			}
+  			catch (DBException dbe) {
+  				AppLogger.log("DBException closing database connection: " + dbe.getMessage());
+  			}
+  		}
+
+  	}
+
+	/**
+  	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+  	 */
+  	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  		//TODO: copy getPost() when done editing
+  		doGet(request, response);
+  	}
+
+  	
+  	/**
+  	 * 
+  	 * NOTHING BELOW THIS POINT NEEDS TO BE EDITED FOR THE liveProject
+  	 *
+  	 */
+  
+  	/**
+  	 * Check the request to make sure everything is valid including parameters
+  	 * 
+  	 * @param request
+  	 * @param response
+  	 * @return boolean if no errors were detected
+  	 */
+  	public boolean isRequestValid(HttpServletRequest request, HttpServletResponse response) {
+ 
+ 		//parse params
+  		try {
+  			parseParams(request, response);
+  			return true;
+  		}
+  		catch(AppException ae) {
+  			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+  			ServletUtilities.sendError(response, ae.getMessage());
+  			return false;
+  		}
+  	}
+  	
+  	
+  	/**
+  	 * Verify the required parameters where passed 
+  	 * 
+  	 * @param request
+  	 * @param response
+  	 */
+  	private void parseParams(HttpServletRequest request, HttpServletResponse response) throws AppException {
+ 		params = request.getParameterMap(); 
+
+  		// return an error if the Map is null or empty
+  		if(params == null || params.isEmpty()) {
+  			throw new AppException("no params sent", "missing request parameters");
+  		}
+  		
+  		
+  		/**
+  		 * 
+  		 * check if the action param was sent
+  		 * 
+  		 * SpotBugs tags this get() request as a possible flaw since it did not see the
+  		 * The params Map is populated above with request.getParameterMap()
+  		 */
+  		
+  		if(params.get("project") == null) {
+  			throw new AppException("project param not sent", "missing request parameters");
+  		}
+  		else {
+  			// avoid parameter overloading attack and only select the first item in the array
+  			this.project = params.get("project")[0];
+  		}
+
+  		// check if the task param was sent
+  		if(params.get("task") == null) {
+  			throw new AppException("task param not sent", "missing request parameters");
+  		}
+  		else {
+  			// avoid parameter overloading attack and only select the first item in the array
+  			this.task = params.get("task")[0];
+  		}
+  		
+  	}//end parseParams
+
+  	
+  	/**
+  	 * Internal method to discover the proper method to call by using reflection
+  	 * 
+  	 * IMPORTANT: THIS CODE IS NOT PART OF THE EXERCISES TO REVIEW
+  	 * The method is only here to simplify the code base and dynamically call
+  	 * the tasks since there are so many in the projects.
+  	 * 
+  	 * @param requestClass The Project class requested
+  	 * @return Method discovered based on the string of the task name and a valid method which doesn't cause an Exception
+  	 * @throws AppException
+  	 */
+    private Method getProjectMethod(Class<?> requestClass) throws AppException {
+        Method method=null;
+        Class<?>[] classTypes = {Integer.class, String.class};
+
+        for(int i=0; i < classTypes.length; i++ ) {
+        	try {
+        		method = requestClass.getDeclaredMethod(task, classTypes[i]);
+        		
+        		AppLogger.log("Used getProjectMethod() to discover task: " + task + " with param type: " + classTypes[i].getCanonicalName());
+        		paramType = classTypes[i].getSimpleName();
+                        
+        		return(method);
+        	}
+        	catch(NoSuchMethodException | SecurityException constructorEx) {
+        		//ignore exception
+        	}
+        }
+        
+        //throw exception if reaching this point and method was not discovered
+        throw new AppException("getProjectMethod() caught exception for invalid Project class: " + requestClass.getSimpleName() +
+                " with task: " + task, "application error");
+    }
+
+ 
+  	
+  	/**
+  	 * Internal method to discover the proper Project to use via reflection
+  	 * 
+  	 * IMPORTANT: THIS CODE IS NOT PART OF THE EXERCISES TO REVIEW
+  	 * The method is only here to simplify the code base and dynamically call
+  	 * the tasks since there are so many in the projects.
+  	 * 
+  	 * @param String of the Project name to discover
+  	 * @return Project class discovered based on the string of the name
+  	 * @throws AppException
+  	 */
+  	private Project getProjectClass(String projectName, Connection connection, HttpServletRequest request) throws AppException{
+		if(projectName == null || connection == null || request == null) {
+			throw new AppException("getProjectObject() was passed a null variable", "application error");
+		}
+  		
+		//capitalize the first letter of the project name to match the class
+		String className = "com.johnsonautoparts." + projectName.substring(0, 1).toUpperCase() + projectName.substring(1);
+		
+		Class<?> reflectedClass = null;
+		
+		try {
+			reflectedClass = Class.forName(className);
+			Constructor<?> projectConstructor = reflectedClass.getConstructor(new Class[] {Connection.class, HttpSession.class});
+						
+			Project reflectedProject = (Project) projectConstructor.newInstance(connection, request.getSession());
+			
+			return(reflectedProject);
+		}
+		catch(ClassNotFoundException cnfe) {
+			throw new AppException("getProjectObject() caught exception of ClassNotFound for project name: " + className, "application error");
+		}
+		catch(NoSuchMethodException | SecurityException constructorEx) {
+			throw new AppException("getProjectObject caught exception for invalid Project class: " + reflectedClass.getClass().toString(), "application error");
+		}
+		catch(InvocationTargetException | IllegalAccessException | InstantiationException instanceEx) {
+			throw new AppException("getProjetObject caught exception for invalid constuctor", "application error");
+		}
+		
+  	}
+  	
+}
