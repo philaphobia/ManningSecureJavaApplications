@@ -134,11 +134,27 @@ public class Project1 extends Project {
 	 */
 	public boolean regularExpression(String search) {
 		String regex = "(.* password\\[\\w+\\]" + search +  ".*)";
-        Pattern searchPattern = Pattern.compile(regex);
-        Matcher patternMatcher = searchPattern.matcher(regex);
+        	Pattern searchPattern = Pattern.compile(regex);
+
+		// retrieve the error even from the session
+        	HttpSession session = httpRequest.getSession();
         
-        //return boolean result of the find() operation
-        return patternMatcher.find();
+        	// make sure data was retrieved from the attribute
+        	Object errorEventObject = session.getAttribute("error_event");
+        	if( errorEventObject == null) {
+        		return false;
+        	}
+        
+        	// make sure the content is a String before comparing
+        	if(errorEventObject instanceof String) {
+        		Matcher patternMatcher = searchPattern.matcher(errorEventObject.toString());
+        
+        		//return boolean result of the find() operation
+        		return patternMatcher.find();
+        	}
+        	else {
+        		return false;
+		}
 	}
 	
 	
