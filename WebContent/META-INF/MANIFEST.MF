@@ -3,9 +3,9 @@ Created-By: 1.8.0_144
 Extension-Name: com.johnsonautoparts 
 Specification-Title: Secure Coding 
 Specification-Version: 0.1
-Specification-Vendor: Manning liveProject
-Implementation-Title: SecureCoding
+Specification-Vendor: Philip Kulp, PHK Cyber LLC
+Implementation-Title: SecureCoding 
 Implementation-Version: 0.1
-Implementation-Vendor: Manning liveProject
+Implementation-Vendor: Philip Kulp, PHK Cyber LLC
 X-Compile-Source-JDK: 1.8
 X-Compile-Target-JDK: 1.8

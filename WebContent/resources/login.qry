@@ -1,0 +1,3 @@
+declare variable $username as xs:string external;
+declare variable $password as xs:string external;
+//users/user[@userName=$username and @password=$password]

@@ -9,6 +9,7 @@ package com.johnsonautoparts.servlet;
  * 
  */ 
 import java.sql.Connection;
+import java.sql.SQLException;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
@@ -37,14 +38,18 @@ public class SessionListener implements HttpSessionListener {
 		HttpSession session = sessionEvent.getSession();
 		if(session != null) {
 			try {
-				Connection connection = (Connection) session.getAttribute("connection");
-				if(connection != null) {
-					connection.close();
+				Object connObj = session.getAttribute("connection");
+				if( connObj != null && connObj instanceof Connection ) {
+					Connection connection = (Connection) connObj;
+					
+					if(connection != null) {
+						connection.close();
+					}
 				}
 				
 				AppLogger.log("Session destroyed.  ID:"+session.getId());
 			}
-			catch(Exception e) {
+			catch(SQLException e) {
 				AppLogger.log("Session destroyed with error.  ID: " +session.getId()
 					+  "  Error: " + e.toString());
 			}

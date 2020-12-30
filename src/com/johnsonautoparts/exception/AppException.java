@@ -6,7 +6,7 @@ package com.johnsonautoparts.exception;
  * Common class for handling exceptions in the application.
  * 
  * The class extends the normal Exception by adding a private message which
- * can be contained in the object to maintain a separate between public messages
+ * can be contained in the object to maintain a separation between public messages
  * returned to users and sensitive internal information used for debugging or logging
  *
  */

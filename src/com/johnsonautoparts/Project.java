@@ -2,7 +2,9 @@ package com.johnsonautoparts;
 
 import java.sql.Connection;
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 
 /**
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
@@ -12,11 +14,13 @@ import javax.servlet.http.HttpSession;
  *
  */
 public abstract class Project {
-	protected HttpSession httpSession=null;
+	protected HttpServletRequest httpRequest=null;
+	protected HttpServletResponse httpResponse=null;
 	protected Connection connection=null;
 	
-	public Project(Connection connection, HttpSession httpSession) {
-		this.httpSession = httpSession;
+	public Project(Connection connection, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+		this.httpRequest = httpRequest;
+		this.httpResponse = httpResponse;
 		this.connection = connection;
 	}
 }
