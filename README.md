@@ -23,4 +23,4 @@ Many Integrated Development Environment (IDE) tools are available for coding in 
 These are resources not referenced in the liveProject but may be helpful to further your understanding of the liveProject's content.
 
 * Eclipse IDE Tutorial - (https://www.tutorialspoint.com/eclipse/)
-* Download Eclipse IDE for Java Developers (https://www.eclipse.org/downloads/packages/)
+* Download Eclipse IDE for Enterprise Java Developers (https://www.eclipse.org/downloads/packages/)
