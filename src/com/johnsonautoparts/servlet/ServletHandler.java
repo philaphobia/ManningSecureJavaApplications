@@ -5,6 +5,8 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Locale;
 import java.util.Map;
 
@@ -41,7 +43,49 @@ public class ServletHandler extends HttpServlet {
   		super();
   	}
   	
+  	
+  	/**
+  	 * Out of band used test functions of WAR
+  	 */
+  	public static void main(String[] args) {
+  		if(! (args.length > 0) ) {
+  			System.err.println("Missing argument");
+  			System.exit(1);
+  		}
+  		
+  		switch(args[0]) {
+  		case "database":
+  			try {
+  				Connection connection = DB.getDbConnection(null);
+  				try (PreparedStatement stmt = connection.prepareStatement("SELECT COUNT(*) FROM tasks") ) {
+  					//do nothing
+  				}
+  			}
+  			catch(DBException dbe) {
+  				dbe.printStackTrace();
+  			}
+  			catch(SQLException sqe) {
+  				sqe.printStackTrace();
+  			}
   			
+  			break;
+  		
+  		default:
+  			System.err.println("Function " + args[0] + " not implemented");
+  			System.exit(1);
+  		}
+  	}
+  	
+  	
+	/**
+  	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+  	 */
+  	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  		//TODO: copy getPost() when done editing
+  		doGet(request, response);
+  	}
+  	
+  	
   	/**
   	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
   	 */
@@ -155,14 +199,6 @@ public class ServletHandler extends HttpServlet {
   			}
   		}
 
-  	}
-
-	/**
-  	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-  	 */
-  	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-  		//TODO: copy getPost() when done editing
-  		doGet(request, response);
   	}
 
   	
