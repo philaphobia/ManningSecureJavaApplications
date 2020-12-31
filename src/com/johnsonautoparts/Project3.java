@@ -474,7 +474,7 @@ public class Project3 extends Project {
 	 *       the generic Throwable which includes RuntimeException.
 	 *       
 	 *  ADDITIONAL: The method to review is the recoverState(). The CheckSession runnable class is
-	 *              only a helper. Focus on how to make the recoverState() able to exist gracefully
+	 *              only a helper. Focus on how to make the recoverState() able to exit gracefully
 	 *              if the possible infinite loop in the Thread continues waiting for the session
 	 *              variable which never appears.
 	 * 
@@ -483,13 +483,11 @@ public class Project3 extends Project {
 	 * @param query
 	 * @return String
 	 */
-	public String recoverState(String str) {
+	public void recoverState(String str) {
 		//create the thread to look for the data_id attribute in the session so we can
 		//do further processing
 		Thread t = new Thread(new CheckSession(httpRequest.getSession()));
 		t.start();
-		
-		return str;
 	}
 	
 	/**
