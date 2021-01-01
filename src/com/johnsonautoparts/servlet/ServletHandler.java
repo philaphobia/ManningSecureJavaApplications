@@ -84,7 +84,7 @@ public class ServletHandler extends HttpServlet {
   		doGet(request, response);
   	}
   	
-  	
+
   	/**
   	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
   	 */
@@ -152,7 +152,7 @@ public class ServletHandler extends HttpServlet {
 					}
 					//all other responses use the default message
 				}
-				
+
 			}
 			catch(NumberFormatException nfe) {
 				throw new AppException("caught NumFormatException: " + nfe.getMessage(), "application error");

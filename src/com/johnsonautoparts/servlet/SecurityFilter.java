@@ -9,6 +9,7 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -85,9 +86,11 @@ public class SecurityFilter implements Filter {
 			chain.doFilter(request, response);
             
 		} 
-		catch (Exception e) {
-			AppLogger.log("Exception in security filter: " + e.getMessage());
-
+		catch (ServletException se) {
+			AppLogger.log("Exception in security filter: " + se.getMessage());
+  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+  			ServletUtilities.sendError(response, "application error");
+ 			
 			// return without forwarding to the next filter to stop
             return;
 		}
@@ -116,4 +119,5 @@ public class SecurityFilter implements Filter {
 		
 	    return referer.contains(servletPath);
 	}
+	
 }
