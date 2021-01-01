@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -14,8 +15,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.johnsonautoparts.Project;
+import com.johnsonautoparts.Project4;
 import com.johnsonautoparts.db.DB;
 import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.exception.DBException;
@@ -80,8 +83,65 @@ public class ServletHandler extends HttpServlet {
   	 * Handle POST request
   	 */
   	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-  		//TODO: copy getPost() when done editing
-  		doGet(request, response);
+  		AppLogger.log("Processing POST request");
+  		
+  		//set the default response and content-type
+  		String responseContent="<html><body>All Good</body></html>";
+  		response.setContentType("text/html");
+
+  		
+  		// check if the task param was sent
+  		String action=null;
+  		if(request.getParameter("action") == null) {
+  			action="";
+  		}
+  		else {
+  			// avoid parameter overloading attack and only select the first item in the array
+  			action = request.getParameter("action");
+  		}
+
+  		switch(action) {
+  		case "login":
+  			try {
+  				Map<String,String> loginParams = parseLoginParams(request);
+  				
+  				System.out.println("\nUser: " + loginParams.get("username") + " Pass: " + 
+  						loginParams.get("password") + " Secure: " + 
+  						Boolean.parseBoolean(loginParams.get("secure_login")));
+  				
+  				Connection connection = getConnection(request);
+  				Project4 project4 = new Project4(connection, request, response);
+  			}
+  			catch(AppException ae) {
+  	  			AppLogger.log("POST caught AppException: " + ae.getMessage());
+  	  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+  	  			ServletUtilities.sendError(response, "application error");
+  	  			return;
+  			}
+  			finally {
+  				try {
+  					DB.closeDbConnection(request.getSession());
+  				}
+  				catch(DBException dbe) {
+  					AppLogger.log("DBException closing database connection: " + dbe.getMessage());
+  				}
+  			}
+  		
+  			//send successful response
+  			PrintWriter out = response.getWriter();
+  			out.println(responseContent);
+  			
+  			break;
+  			
+  		default:
+  			//nothing matched so process as a GET
+  			doGet(request, response);
+  			
+  			break;
+  		}
+  		
+  		//done processing POST so return
+  		return;
   	}
   	
 
@@ -89,25 +149,24 @@ public class ServletHandler extends HttpServlet {
   	 * Handle GET request
   	 */
   	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
- 		//set the default response and content-type
+ 		AppLogger.log("Processing GET request");
+
+  		//set the default response and content-type
   		String responseContent="<html><body>All Good</body></html>";
   		response.setContentType("text/html");
   		
  		/**
  		 * Make sure everything is good before proceeding or throw an exception
  		 */
- 		if(! isRequestValid(request, response) ) {
+ 		if(! isRequestValid(request) ) {
  			throw new ServletException("Invalid request sent to " + request.getServletPath());
  		}
  		
  		
  		//main logic to parse action
   		try {
-  			// get a connection to the database
-  			Connection connection = DB.getDbConnection(request.getSession());
-
   			//minimize code by using reflection to discover classes and methods
-			Project projectClass = getProjectClass(project, connection, request, response);
+			Project projectClass = getProjectClass(project, getConnection(request), request, response);
 			Method method = getProjectMethod(projectClass.getClass());
 			//ProjectCaller projectCaller = getProjectCaller(project, connection, request);
 
@@ -168,17 +227,6 @@ public class ServletHandler extends HttpServlet {
   		}
   		
   		/**
-  		 * Database exception errors are caught
-  		 * Full message is logged but a general error is sent to the request
-  		 */
-  		catch (DBException dbe) {
-  			AppLogger.log("DB error: " + dbe.getMessage());
-  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-  			ServletUtilities.sendError(response, "application error");
-  			return;
-  		}
-  		
-  		/**
   		 * Application exception errors are caught
   		 * Private message is logged and the public message is returned to the request
   		 */
@@ -215,11 +263,11 @@ public class ServletHandler extends HttpServlet {
   	 * @param response
   	 * @return boolean if no errors were detected
   	 */
-  	public boolean isRequestValid(HttpServletRequest request, HttpServletResponse response) {
+  	public boolean isRequestValid(HttpServletRequest request) {
  
  		//parse params
   		try {
-  			parseParams(request, response);
+  			parseParams(request);
   			return true;
   		}
   		catch(AppException ae) {
@@ -235,7 +283,7 @@ public class ServletHandler extends HttpServlet {
   	 * @param request
   	 * @param response
   	 */
-  	private void parseParams(HttpServletRequest request, HttpServletResponse response) throws AppException {
+  	private void parseParams(HttpServletRequest request) throws AppException {
  		params = request.getParameterMap(); 
 
   		// return an error if the Map is null or empty
@@ -270,6 +318,54 @@ public class ServletHandler extends HttpServlet {
   		}
   		
   	}//end parseParams
+
+
+  	/**
+  	 * Verify the required parameters where passed 
+  	 * 
+  	 * @param request
+  	 * @param response
+  	 */
+  	private Map<String,String> parseLoginParams(HttpServletRequest request) throws AppException {
+ 		params = request.getParameterMap(); 
+
+ 		Map<String,String> loginParams = new HashMap<>();
+ 		
+  		// return an error if the Map is null or empty
+  		if(params == null || params.isEmpty()) {
+  			throw new AppException("no params sent", "missing request parameters");
+  		}
+  		
+
+  		//username
+  		if(params.get("username") == null) {
+  			throw new AppException("username param not sent", "missing request parameters");
+  		}
+  		else {
+  			// avoid parameter overloading attack and only select the first item in the array
+  			loginParams.put("username", params.get("username")[0]);
+  		}
+
+  		//password
+  		if(params.get("password") == null) {
+  			throw new AppException("password param not sent", "missing request parameters");
+  		}
+  		else {
+  			// avoid parameter overloading attack and only select the first item in the array
+  			loginParams.put("password", params.get("password")[0]);
+  		}
+  		
+  		//secure_form flag
+  		if(params.get("secure_form") == null) {
+  			throw new AppException("secure_form param not sent", "missing request parameters");
+  		}
+  		else {
+  			// avoid parameter overloading attack and only select the first item in the array
+  			loginParams.put("secure_form", params.get("secure_form")[0]);
+  		}
+  		
+  		return loginParams;
+  	}//end parseLoginParams
 
   	
   	/**
@@ -347,6 +443,32 @@ public class ServletHandler extends HttpServlet {
 			throw new AppException("getProjetObject caught exception for invalid constuctor: " + instanceEx.getMessage(), "application error");
 		}
 		
+  	}
+
+  	
+  	/**
+  	 * Internal method to resolve the DB conneciton
+  	 * 
+  	 * IMPORTANT: THIS CODE IS NOT PART OF THE EXERCISES TO REVIEW
+  	 * 
+  	 */
+  	private Connection getConnection(HttpServletRequest request) throws AppException {
+  			HttpSession session = request.getSession();
+  			Object connectionObj = request.getAttribute("connection");
+  			
+			if(connectionObj != null && connectionObj instanceof Connection) {
+				return (Connection) connectionObj;
+			}
+			//no Connection so try to get one
+			else {
+				try {
+					return DB.getDbConnection(session);
+				}
+				catch(DBException dbe) {
+					throw new AppException("getConnection could not establish a DB connection: " + dbe.getMessage(), "application error");
+				}
+			}
+			
   	}
   	
 }

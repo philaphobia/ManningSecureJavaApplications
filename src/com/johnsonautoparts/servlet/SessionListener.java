@@ -15,6 +15,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+import com.johnsonautoparts.db.DB;
 import com.johnsonautoparts.logger.AppLogger;
 
 public class SessionListener implements HttpSessionListener {
@@ -23,8 +24,8 @@ public class SessionListener implements HttpSessionListener {
 		HttpSession session = sessionEvent.getSession();
 		if(session != null) {
 			try {
-				//Connection connection = DB.getDbConnection(session);
-				//session.setAttribute("connection", connection);
+				Connection connection = DB.getDbConnection(session);
+				session.setAttribute("connection", connection);
 				AppLogger.log("Session Created.  ID: " + session.getId());
 			}
 			catch(Exception e) {
@@ -41,16 +42,17 @@ public class SessionListener implements HttpSessionListener {
 				Object connObj = session.getAttribute("connection");
 				if( connObj != null && connObj instanceof Connection ) {
 					Connection connection = (Connection) connObj;
+					AppLogger.log("Closing DB connection for ID: " + session.getId());
 					
 					if(connection != null) {
 						connection.close();
 					}
 				}
 				
-				AppLogger.log("Session destroyed.  ID:"+session.getId());
+				AppLogger.log("Session destroyed.  ID: "+session.getId());
 			}
 			catch(SQLException e) {
-				AppLogger.log("Session destroyed with error.  ID: " +session.getId()
+				AppLogger.log("Session destroyed with error.  ID: " + session.getId()
 					+  "  Error: " + e.toString());
 			}
 		}

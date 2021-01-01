@@ -56,8 +56,9 @@ public class SecurityFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 		
 		//validate referer
-		if(! isValidReferer(request) ) {
-			sendSecurityError(response, "Request failed isValidReferer");
+		if(! isValidRefererForm(request) ) {
+			sendSecurityError(request, response, "Request failed isValidReferer");
+			return;
 		}
 		
 		try {			
@@ -79,18 +80,16 @@ public class SecurityFilter implements Filter {
 			 * Send request to /accessdenied.jsp
 			 */
 	    	else {
-	    		sendSecurityError(response, "Unknown request verb used: " + request.getMethod());
+	    		sendSecurityError(request, response, "Unknown request verb used: " + request.getMethod());
                 
-                // return without forwarding to the next filter to stop
                 return;
 	    	}
 			
 			// forward this request on to the web application
-			chain.doFilter(request, response);
-            
+			chain.doFilter(request, response);   
 		} 
 		catch (ServletException se) {
-			sendSecurityError(response, se.getMessage());
+			sendSecurityError(request, response, se.getMessage());
 			// return without forwarding to the next filter to stop
             return;
 		}
@@ -113,10 +112,19 @@ public class SecurityFilter implements Filter {
 	 * 
 	 * @param request
 	 */
-	private void sendSecurityError(HttpServletResponse response, String err) {
+	//private void sendSecurityError(HttpServletResponse response, String err) {
+	private void sendSecurityError(HttpServletRequest request, HttpServletResponse response, String err) {
 		AppLogger.log("Exception in security filter: " + err);
-		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-		ServletUtilities.sendError(response, "application error");
+		//response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+		//ServletUtilities.sendError(response, "application error");
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/accessdenied.jsp");
+		
+		try {
+			dispatcher.forward(request, response);
+		}
+		catch(IOException | ServletException e) {
+			AppLogger.log("SecurityFilter failed to forward to accessdenied.jsp: " + e.getMessage());
+		}
 	}
 	
 	
@@ -124,21 +132,20 @@ public class SecurityFilter implements Filter {
 	 * Method to check if the referer is valid and contains the servlet path
 	 * context.
 	 */
-	private boolean isValidReferer(HttpServletRequest request) {
-		String servletPath = request.getServletPath();
-		if(servletPath == null) {
-			AppLogger.log("SecurityFilter failed with null servletPath");
-			return false;
-		}
-		
+	private boolean isValidRefererForm(HttpServletRequest request) {
+		final String loginForm = "login.jsp";
+		System.out.println("\nHERE2\n");
 		String referer = request.getHeader("referer");
 		if(referer == null) {
 			//do not test if referer is null
 			return true;
 		}
 		
+		System.out.println("\nHERE3\n");
+		
+		AppLogger.log("SecurityFilter check isValidReferer: " + referer);
 		//return boolean of contains
-	    return referer.contains(servletPath);
+	    return referer.contains(loginForm);
 	}
 
 }
