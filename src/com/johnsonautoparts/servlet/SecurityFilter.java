@@ -32,7 +32,7 @@ public class SecurityFilter implements Filter {
 	 *            configuration object
 	 */
 	public void init(FilterConfig filterConfig) {
-
+		//initializing steps
 	}
 
 	/**
@@ -55,6 +55,11 @@ public class SecurityFilter implements Filter {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
 		
+		//validate referer
+		if(! isValidReferer(request) ) {
+			sendSecurityError(response, "Request failed isValidReferer");
+		}
+		
 		try {			
             // add all the require security headers
 			ServletUtilities.addSecurityHeaders(response);
@@ -74,9 +79,7 @@ public class SecurityFilter implements Filter {
 			 * Send request to /accessdenied.jsp
 			 */
 	    	else {
-	    		AppLogger.log("Unknown request verb used: " + request.getMethod());
-	    		RequestDispatcher dispatcher = request.getRequestDispatcher("/accessdenied.jsp");
-                dispatcher.forward(request, response);
+	    		sendSecurityError(response, "Unknown request verb used: " + request.getMethod());
                 
                 // return without forwarding to the next filter to stop
                 return;
@@ -87,10 +90,7 @@ public class SecurityFilter implements Filter {
             
 		} 
 		catch (ServletException se) {
-			AppLogger.log("Exception in security filter: " + se.getMessage());
-  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-  			ServletUtilities.sendError(response, "application error");
- 			
+			sendSecurityError(response, se.getMessage());
 			// return without forwarding to the next filter to stop
             return;
 		}
@@ -108,16 +108,37 @@ public class SecurityFilter implements Filter {
 	}
 
 	
+	/**
+	 * Standardize error sent to user
+	 * 
+	 * @param request
+	 */
+	private void sendSecurityError(HttpServletResponse response, String err) {
+		AppLogger.log("Exception in security filter: " + err);
+		response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+		ServletUtilities.sendError(response, "application error");
+	}
+	
+	
 	/*
 	 * Method to check if the referer is valid and contains the servlet path
 	 * context.
 	 */
 	private boolean isValidReferer(HttpServletRequest request) {
-		String referer = request.getHeader("referer");
-		
 		String servletPath = request.getServletPath();
+		if(servletPath == null) {
+			AppLogger.log("SecurityFilter failed with null servletPath");
+			return false;
+		}
 		
+		String referer = request.getHeader("referer");
+		if(referer == null) {
+			//do not test if referer is null
+			return true;
+		}
+		
+		//return boolean of contains
 	    return referer.contains(servletPath);
 	}
-	
+
 }

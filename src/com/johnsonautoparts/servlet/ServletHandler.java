@@ -77,7 +77,7 @@ public class ServletHandler extends HttpServlet {
   	
   	
 	/**
-  	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+  	 * Handle POST request
   	 */
   	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
   		//TODO: copy getPost() when done editing
@@ -86,7 +86,7 @@ public class ServletHandler extends HttpServlet {
   	
 
   	/**
-  	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+  	 * Handle GET request
   	 */
   	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
  		//set the default response and content-type

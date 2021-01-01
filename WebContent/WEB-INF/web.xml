@@ -22,11 +22,11 @@
       <listener-class>com.johnsonautoparts.servlet.RequestListener</listener-class>
    </listener>
    <filter>
-      <filter-name>security-filter</filter-name>
+      <filter-name>SecurityFilter</filter-name>
       <filter-class>com.johnsonautoparts.servlet.SecurityFilter</filter-class>
    </filter>
    <filter-mapping>
-      <filter-name>security-filter</filter-name>
+      <filter-name>SecurityFilter</filter-name>
       <url-pattern>/app</url-pattern>
    </filter-mapping>
    <servlet>
