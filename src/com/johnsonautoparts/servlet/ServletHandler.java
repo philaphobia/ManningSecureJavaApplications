@@ -14,7 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.johnsonautoparts.Project;
 import com.johnsonautoparts.db.DB;
@@ -95,10 +94,10 @@ public class ServletHandler extends HttpServlet {
   		response.setContentType("text/html");
   		
  		/**
- 		 * Make sure everything is good before proceeding
+ 		 * Make sure everything is good before proceeding or throw an exception
  		 */
  		if(! isRequestValid(request, response) ) {
- 			return;
+ 			throw new ServletException("Invalid request sent to " + request.getServletPath());
  		}
  		
  		
@@ -165,6 +164,7 @@ public class ServletHandler extends HttpServlet {
   			//send successful response
   			PrintWriter out = response.getWriter();
   			out.println(responseContent);
+  			return;
   		}
   		
   		/**
@@ -223,8 +223,7 @@ public class ServletHandler extends HttpServlet {
   			return true;
   		}
   		catch(AppException ae) {
-  			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-  			ServletUtilities.sendError(response, ae.getMessage());
+  			AppLogger.log("parseParams caught exception: " + ae.getPrivateMessage());
   			return false;
   		}
   	}
@@ -293,7 +292,7 @@ public class ServletHandler extends HttpServlet {
         		method = requestClass.getDeclaredMethod(task, classTypes[i]);
         		
         		AppLogger.log("Used getProjectMethod() to discover task: " + task + " with param type: " + classTypes[i].getCanonicalName());
-        		paramType = classTypes[i].getSimpleName();
+        		this.paramType = classTypes[i].getSimpleName();
                         
         		return(method);
         	}

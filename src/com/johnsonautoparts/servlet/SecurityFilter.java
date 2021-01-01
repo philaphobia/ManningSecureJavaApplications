@@ -56,7 +56,7 @@ public class SecurityFilter implements Filter {
 		
 		try {			
             // add all the require security headers
-			addSecurityHeaders(response);
+			ServletUtilities.addSecurityHeaders(response);
 			
 			
 			// throw an exception if a method other than GET or POST is sent
@@ -105,21 +105,15 @@ public class SecurityFilter implements Filter {
 	}
 
 	
-	/**
-	 * Common method for adding all the require security headers
-	 * @param response
+	/*
+	 * Method to check if the referer is valid and contains the servlet path
+	 * context.
 	 */
-	public void addSecurityHeaders(HttpServletResponse response) {
-		//click-jacking defense so content cannot be framed from a different website
-		response.addHeader("X-Frame-Options", "SAMEORIGIN");
-
-		//forces client to only use content-type sent from server and not try to
-		//determine the content type by magic sniffing
-		response.addHeader("X-Content-Type-Options", "nosniff");
-		  
-		  
-		//stop caching
-		response.addHeader("Cache-Control", "no-store");
-	  }
-	
+	private boolean isValidReferer(HttpServletRequest request) {
+		String referer = request.getHeader("referer");
+		
+		String servletPath = request.getServletPath();
+		
+	    return referer.contains(servletPath);
+	}
 }
