@@ -49,7 +49,7 @@ public class SessionListener implements HttpSessionListener {
 					}
 				}
 				
-				AppLogger.log("Session destroyed.  ID: "+session.getId());
+				AppLogger.log("Session destroyed.  ID: " + session.getId());
 			}
 			catch(SQLException e) {
 				AppLogger.log("Session destroyed with error.  ID: " + session.getId()

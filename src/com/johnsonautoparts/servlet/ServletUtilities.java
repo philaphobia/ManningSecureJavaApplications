@@ -26,10 +26,13 @@ public class ServletUtilities {
 	  //forces client to only use content-type sent from server and not try to
 	  //determine the content type by magic sniffing
 	  response.addHeader("X-Content-Type-Options", "nosniff");
-	  
-	  
+
 	  //stop caching
 	  response.addHeader("Cache-Control", "no-store");
+	  
+	  //Content-Security-Policy
+	  //X-Frame-Options is ignored if CSF defined but some browsers ignore so just set this
+	  response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
   }
 
 

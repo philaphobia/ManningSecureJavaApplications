@@ -92,11 +92,10 @@ public class ServletHandler extends HttpServlet {
   		
   		// check if the task param was sent
   		String action=null;
-  		if(request.getParameter("action") == null) {
+  		if(request.getParameter("action") == null || request.getParameter("action").isEmpty()) {
   			action="";
   		}
   		else {
-  			// avoid parameter overloading attack and only select the first item in the array
   			action = request.getParameter("action");
   		}
 
@@ -104,27 +103,15 @@ public class ServletHandler extends HttpServlet {
   		case "login":
   			try {
   				Map<String,String> loginParams = parseLoginParams(request);
-  				
-  				System.out.println("\nUser: " + loginParams.get("username") + " Pass: " + 
-  						loginParams.get("password") + " Secure: " + 
-  						Boolean.parseBoolean(loginParams.get("secure_login")));
-  				
+
   				Connection connection = getConnection(request);
   				Project4 project4 = new Project4(connection, request, response);
   			}
   			catch(AppException ae) {
-  	  			AppLogger.log("POST caught AppException: " + ae.getMessage());
+  	  			AppLogger.log("POST caught AppException: " + ae.getPrivateMessage());
   	  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-  	  			ServletUtilities.sendError(response, "application error");
+  	  			ServletUtilities.sendError(response, ae.getMessage());
   	  			return;
-  			}
-  			finally {
-  				try {
-  					DB.closeDbConnection(request.getSession());
-  				}
-  				catch(DBException dbe) {
-  					AppLogger.log("DBException closing database connection: " + dbe.getMessage());
-  				}
   			}
   		
   			//send successful response
@@ -135,6 +122,7 @@ public class ServletHandler extends HttpServlet {
   			
   		default:
   			//nothing matched so process as a GET
+  			AppLogger.log("Cannot process POST request, forwarding to GET");
   			doGet(request, response);
   			
   			break;
@@ -236,16 +224,6 @@ public class ServletHandler extends HttpServlet {
   			ServletUtilities.sendError(response, ae.getMessage());
   			return;
   		}
-  		
-  		// Use finally to close the database connection
-  		finally {
-  			try {
-  				DB.closeDbConnection(request.getSession());
-  			}
-  			catch (DBException dbe) {
-  				AppLogger.log("DBException closing database connection: " + dbe.getMessage());
-  			}
-  		}
 
   	}
 
@@ -335,7 +313,6 @@ public class ServletHandler extends HttpServlet {
   		if(params == null || params.isEmpty()) {
   			throw new AppException("no params sent", "missing request parameters");
   		}
-  		
 
   		//username
   		if(params.get("username") == null) {
