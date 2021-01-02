@@ -2,7 +2,7 @@
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
    <display-name>SecureCoding</display-name>
    <session-config>
-      <session-timeout>15</session-timeout>
+      <session-timeout>5</session-timeout>
    </session-config>
    <servlet>
       <servlet-name>app</servlet-name>
@@ -29,6 +29,14 @@
       <filter-name>SecurityFilter</filter-name>
       <url-pattern>/app</url-pattern>
    </filter-mapping>
+   <!--filter>
+      <filter-name>CSRFValidationFilter</filter-name>
+      <filter-class>com.johnsonautoparts.servlet.CSRFValidationFilter</filter-class>
+   </filter>
+   <filter-mapping>
+      <filter-name>CSRFValidationFilter</filter-name>
+      <url-pattern>/app</url-pattern>
+   </filter-mapping-->
    <servlet>
       <servlet-name>CsrfServlet</servlet-name>
       <servlet-class>org.owasp.csrfguard.servlet.JavaScriptServlet</servlet-class>

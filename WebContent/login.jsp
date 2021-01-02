@@ -7,7 +7,7 @@
 <title>Login Form</title>
 </head>
 <body>
-<form action="/app" method="post">
+<form action="/SecureCoding/app" method="post">
 		<table style="with: 50%">
  
 			<tr>
