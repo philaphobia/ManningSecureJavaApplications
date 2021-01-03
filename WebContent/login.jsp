@@ -7,7 +7,7 @@
 <title>Login Form</title>
 </head>
 <body>
-<form action="/SecureCoding/app" method="post">
+<form action="<%=request.getServletContext().getContextPath() %>/app" method="post">
 		<table style="with: 50%">
  
 			<tr>

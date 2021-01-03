@@ -21,6 +21,7 @@ import com.johnsonautoparts.logger.AppLogger;
  *
  */
 public class SecurityFilter implements Filter {
+	private static final String[] REFERERS = {"login.jsp", "comments.jsp"};
 
 	/**
 	 * Called by the web container to indicate to a filter that it is being
@@ -133,19 +134,23 @@ public class SecurityFilter implements Filter {
 	 * context.
 	 */
 	private boolean isValidRefererForm(HttpServletRequest request) {
-		final String loginForm = "login.jsp";
-		System.out.println("\nHERE2\n");
 		String referer = request.getHeader("referer");
 		if(referer == null) {
 			//do not test if referer is null
 			return true;
 		}
 		
-		System.out.println("\nHERE3\n");
-		
 		AppLogger.log("SecurityFilter check isValidReferer: " + referer);
-		//return boolean of contains
-	    return referer.contains(loginForm);
+
+		//check all whitelist referers
+		for(String whitelistRefer : REFERERS) {
+			if(referer.contains(whitelistRefer)) {
+				return true;
+			}
+		}
+		
+		//did not match any whitelist so return false
+	    return false;
 	}
 
 }

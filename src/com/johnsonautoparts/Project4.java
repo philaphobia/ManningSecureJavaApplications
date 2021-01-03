@@ -17,6 +17,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.johnsonautoparts.exception.AppException;
 
+
 /**
  * 
  * Project4 class which contains all the method for the milestones. The task number 
@@ -37,24 +38,6 @@ public class Project4 extends Project {
 		super(connection, httpRequest, httpResponse);
 	}
 	
-	/**
-	public enum Status {
-		OK,
-		ERROR
-	};
-	
-	Status status;
-	String error;
-	
-	public void setStatus(Status status) {
-		this.status=status;
-	}
-	
-	public void setError(String error) {
-		this.error=error;
-	}
-	**/
-	
 	
 	/**
 	 * Project 4 - Task #
@@ -65,6 +48,7 @@ public class Project4 extends Project {
 	 * @param str
 	 * @return String
 	 */
+	
 	public String project4TaskNNN(String str) {
 		//TODO
 		return str;

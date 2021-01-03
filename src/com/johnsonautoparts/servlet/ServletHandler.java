@@ -161,7 +161,7 @@ public class ServletHandler extends HttpServlet {
 			try {
 				String[] paramStr=params.get("param1");
 				if( (paramStr==null) || (paramStr[0]==null) || (paramStr[0].trim().isEmpty())) {
-					throw new AppException("param 1 is empty", "account id incorrect");
+					throw new AppException("param 1 is empty", "param1 incorrect");
 				}
 					
 				//String for the content
