@@ -2,9 +2,10 @@ package com.johnsonautoparts.servlet;
 
 import java.io.*;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.http.HttpServletResponse;
 
-import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
 
 /**
@@ -43,11 +44,15 @@ public class ServletUtilities {
 	  PrintWriter out=null;
 
 	  try {
-		  response.setContentType("text/html");
+		  response.setContentType("application/json");
 		  out = response.getWriter();
 
 		  if(out != null) {
-			  out.println("<html><head><body>" + errorMsg + "</body></html>");
+			  JsonObject json = Json.createObjectBuilder()
+						.add("status", "error")
+						.add("message", errorMsg)
+					.build();
+			  out.println(json);
 		  }
 	  }
 	  catch(Exception e) {

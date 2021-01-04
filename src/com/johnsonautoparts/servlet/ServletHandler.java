@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -86,11 +88,14 @@ public class ServletHandler extends HttpServlet {
   		AppLogger.log("Processing POST request");
   		
   		//set the default response and content-type
-  		String responseContent="<html><body>All Good</body></html>";
-  		response.setContentType("text/html");
+ 		JsonObject jsonOk = Json.createObjectBuilder()
+					.add("status", "ok")
+					.build();
+		String responseContent = jsonOk.toString();
+  		response.setContentType("application/json");
 
   		
-  		// check if the task param was sent
+  		// check if the task param1 was sent
   		String action=null;
   		if(request.getParameter("action") == null || request.getParameter("action").isEmpty()) {
   			action="";
@@ -99,6 +104,7 @@ public class ServletHandler extends HttpServlet {
   			action = request.getParameter("action");
   		}
 
+  		//check the action
   		switch(action) {
   		case "login":
   			try {
@@ -106,6 +112,10 @@ public class ServletHandler extends HttpServlet {
 
   				Connection connection = getConnection(request);
   				Project4 project4 = new Project4(connection, request, response);
+  				
+  				//call login
+  				boolean loginResponse = project4.login(loginParams.get("username"), loginParams.get("password"), loginParams.get("secure_form"));
+  				responseContent = Boolean.toString(loginResponse);
   			}
   			catch(AppException ae) {
   	  			AppLogger.log("POST caught AppException: " + ae.getPrivateMessage());
@@ -140,8 +150,11 @@ public class ServletHandler extends HttpServlet {
  		AppLogger.log("Processing GET request");
 
   		//set the default response and content-type
-  		String responseContent="<html><body>All Good</body></html>";
-  		response.setContentType("text/html");
+ 		JsonObject jsonOk = Json.createObjectBuilder()
+ 					.add("status", "ok")
+ 					.build();
+ 		String responseContent = jsonOk.toString();
+  		response.setContentType("application/json");
   		
  		/**
  		 * Make sure everything is good before proceeding or throw an exception
@@ -191,12 +204,23 @@ public class ServletHandler extends HttpServlet {
 				
 				//update the responseData
 				if(response.getContentType() != null) {
-					if(response.getContentType().contains("html") ) {
-						responseContent = "<html><body>" + responseData + "</body></html>";
+					//check for JSON object returned
+					if(responseData != null && responseData instanceof JsonObject) {
+						responseContent = responseData.toString();
 					}
+					//look for XML data
 					else if(response.getContentType().contains("xml")) {
 						responseContent = responseData.toString();
 					}
+					//return default json data
+					else {
+				 		JsonObject jsonContent = Json.createObjectBuilder()
+			 					.add("status", "ok")
+			 					.add("message", responseData.toString())
+			 					.build();
+				 		responseContent = jsonContent.toString();
+					}
+
 					//all other responses use the default message
 				}
 

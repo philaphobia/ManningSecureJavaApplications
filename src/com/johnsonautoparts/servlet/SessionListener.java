@@ -1,5 +1,6 @@
 package com.johnsonautoparts.servlet;
 
+import java.security.SecureRandom;
 /**
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
  * 
@@ -15,30 +16,50 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
+import java.lang.IllegalStateException;
+
 import com.johnsonautoparts.db.DB;
+import com.johnsonautoparts.exception.DBException;
 import com.johnsonautoparts.logger.AppLogger;
 
 public class SessionListener implements HttpSessionListener {
 	
 	public void sessionCreated(HttpSessionEvent sessionEvent) {
 		HttpSession session = sessionEvent.getSession();
-		if(session != null) {
+
+		if(session != null)  {
+			// Generate random 256-bit (32-byte) shared secret and add to session
+			SecureRandom random = new SecureRandom();
+			byte[] sharedSecret = new byte[32];
+			random.nextBytes(sharedSecret);
+			session.setAttribute("secret", sharedSecret);
+
+			//add a connection to the database to session attribute
 			try {
 				Connection connection = DB.getDbConnection(session);
 				session.setAttribute("connection", connection);
 				AppLogger.log("Session Created.  ID: " + session.getId());
 			}
-			catch(Exception e) {
-				AppLogger.log("Session destroyed with error.  ID: " + session.getId()
-					+  "  Error: " + e.toString());
+			catch(IllegalStateException ise) {
+				AppLogger.log("Session created with error.  ID: " + session.getId()
+					+  "  Error: " + ise.toString());
+			}
+			catch(DBException dbe) {
+				AppLogger.log("Session create exception ID: " + session.getId()
+				+  "  Error: " + dbe.toString());
 			}
 		}
 	}
  
 	public void sessionDestroyed(HttpSessionEvent sessionEvent) {
 		HttpSession session = sessionEvent.getSession();
+
 		if(session != null) {
 			try {
+				//delete the secret key
+				session.setAttribute("secret","");
+			
+				//destroy the db connection
 				Object connObj = session.getAttribute("connection");
 				if( connObj != null && connObj instanceof Connection ) {
 					Connection connection = (Connection) connObj;
@@ -49,10 +70,17 @@ public class SessionListener implements HttpSessionListener {
 					}
 				}
 				
+				//destroy the session
+				session.invalidate();
+				
 				AppLogger.log("Session destroyed.  ID: " + session.getId());
 			}
+			catch(IllegalStateException ise) {
+				AppLogger.log("Session destroy with error.  ID: " + session.getId()
+					+  "  Error: " + ise.toString());
+			}
 			catch(SQLException e) {
-				AppLogger.log("Session destroyed with error.  ID: " + session.getId()
+				AppLogger.log("Session destroy exception ID: " + session.getId()
 					+  "  Error: " + e.toString());
 			}
 		}
