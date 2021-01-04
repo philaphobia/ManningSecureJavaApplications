@@ -57,10 +57,12 @@ public class SecurityFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 		
 		//validate referer
+		/**
 		if(! isValidRefererForm(request) ) {
 			sendSecurityError(request, response, "Request failed isValidReferer");
 			return;
 		}
+		*/
 		
 		try {			
             // add all the require security headers
