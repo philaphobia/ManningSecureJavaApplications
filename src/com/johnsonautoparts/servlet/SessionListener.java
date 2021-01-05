@@ -70,9 +70,6 @@ public class SessionListener implements HttpSessionListener {
 					}
 				}
 				
-				//destroy the session
-				session.invalidate();
-				
 				AppLogger.log("Session destroyed.  ID: " + session.getId());
 			}
 			catch(IllegalStateException ise) {
