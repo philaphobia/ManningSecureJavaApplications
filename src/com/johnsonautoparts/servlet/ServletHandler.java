@@ -102,16 +102,57 @@ public class ServletHandler extends HttpServlet {
 
   		//check the action
   		switch(action) {
+  		//handle login request
   		case "login":
   			try {
   				Map<String,String> loginParams = parseLoginParams(request);
 
+  				//create the project4 instance
   				Connection connection = getConnection(request);
   				Project4 project4 = new Project4(connection, request, response);
   				
   				//call login
-  				boolean loginResponse = project4.login(loginParams.get("username"), loginParams.get("password"), loginParams.get("secure_form"));
-  				responseContent = Boolean.toString(loginResponse);
+  				responseContent = project4.login(loginParams.get("username"), loginParams.get("password"), loginParams.get("secure_form"));
+  			}
+  			catch(AppException ae) {
+  	  			AppLogger.log("POST login caught AppException: " + ae.getPrivateMessage());
+  	  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+  	  			ServletUtilities.sendError(response, ae.getMessage());
+  	  			return;
+  			}
+  		
+  			//send successful response
+  			PrintWriter outLogin = response.getWriter();
+  			outLogin.println(responseContent);
+  			
+  			break;
+  			
+  		//handle file upload request
+  		case "file_upload":
+  			try {
+  		  		// check if the number_files param was sent
+  		  		int numFiles=0;
+  		  		if(request.getParameter("number_files") == null || request.getParameter("number_files").isEmpty()) {
+  		  			throw new AppException("No files to upload","application error");
+  		  		}
+  		  		else {
+  		  			String numFilesParam = request.getParameter("number_files");
+  		  			//try to parse the param as a number
+  		  			try {
+  		  				numFiles = Integer.parseInt(numFilesParam);
+  		  			}
+  		  			catch(NumberFormatException nfe) {
+  		  				throw new AppException("number_files param was not a number", "application error");
+  		  			}
+  		  		}
+  		  		
+  		  		//create the project4 instance
+  				Connection connection = getConnection(request);
+  				Project4 project4 = new Project4(connection, request, response);
+  				
+  				//call fileUpload
+  				boolean uploadResponse = project4.fileUpload(numFiles);
+  				responseContent = Boolean.toString(uploadResponse);
   			}
   			catch(AppException ae) {
   	  			AppLogger.log("POST caught AppException: " + ae.getPrivateMessage());
@@ -121,12 +162,25 @@ public class ServletHandler extends HttpServlet {
   			}
   		
   			//send successful response
-  			PrintWriter out = response.getWriter();
-  			out.println(responseContent);
+  			PrintWriter outUpload = response.getWriter();
+  			outUpload.println(responseContent);
   			
   			break;
   			
+  		//all other actions
   		default:
+  			/**
+  			 * Project 4, Milestone 2, Task 1
+  			 * 
+  			 * TITLE: HTTP verb (method) security
+  			 * 
+  			 * RISK: The webapp should make a clear distinction between how requests are process such as
+  			 *       by POST or GET. Unclear application flow may occur if GET and POST requests are accepted
+  			 *       for the same type of request. Also, GET requests include the parameter data into the web
+  			 *       request log which could allow sensitive information such as password if for example a
+  			 *       login request is processed as a GET. If the login goes through a proxy server or other
+  			 *       service, the data could also be leaked.
+  			 */
   			//nothing matched so process as a GET
   			AppLogger.log("Cannot process POST request, forwarding to GET");
   			doGet(request, response);
@@ -159,11 +213,10 @@ public class ServletHandler extends HttpServlet {
  		
   			//assign the project variable
   			String project = params.get("project");
-  			
+
   			//minimize code by using reflection to discover classes and methods
 			Project projectClass = getProjectClass(project, getConnection(request), request, response);
 			Method method = getProjectMethod(projectClass.getClass(), params);
-
 
 			try {
 				String paramVal = params.get("param_value");
@@ -219,7 +272,6 @@ public class ServletHandler extends HttpServlet {
 				throw new AppException("caught NumFormatException: " + nfe.getMessage(), "application error");
 			}
 			catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException iiie) {
-				iiie.printStackTrace();
 				throw new AppException("caught illegal exception: " + iiie.getMessage(), "application error");
 			}
   			
@@ -230,14 +282,21 @@ public class ServletHandler extends HttpServlet {
   		}
   		
   		/**
-  		 * Application exception errors are caught
-  		 * Private message is logged and the public message is returned to the request
+  		 * Project 4, Milestone 2, Task 3
+  		 * 
+  		 * TITLE: Servlet must not throw errors
+  		 * 
+  		 * RISK: If the servlet of the webapp throws an error it may not be processed in the expected
+  		 *       fashion. This could include causing the webapp to crash or become unstable. If the exception
+  		 *       is handled, the application server may report the entire exception stack back to the user
+  		 *       which could include sensitive information.
+  		 * 
+  		 * REF: SonarSource RSPEC-1989
   		 */
+  		//throw ServletException for processing
   		catch (AppException ae) {
-  			AppLogger.log("AppException: " + ae.getPrivateMessage());
-  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-  			ServletUtilities.sendError(response, ae.getMessage());
-  			return;
+  			AppLogger.log("Caught AppException: " + ae.getPrivateMessage());
+  			throw new ServletException(ae.getPrivateMessage());
   		}
 
   	}
@@ -373,7 +432,7 @@ public class ServletHandler extends HttpServlet {
         for(int i=0; i < classTypes.length; i++ ) {
         	try {
         		method = requestClass.getDeclaredMethod(task, classTypes[i]);
-        		
+
         		AppLogger.log("Used getProjectMethod() to discover task: " + task + " with param type: " + classTypes[i].getCanonicalName());
         		params.put("param_type", classTypes[i].getSimpleName());
                         

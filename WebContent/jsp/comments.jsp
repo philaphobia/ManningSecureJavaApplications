@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="org.owasp.encoder.Encode"%>
 <% 	/**
  * Project 4, Milestone 1, Task 2
  * 
@@ -14,6 +15,8 @@
  * IMPORTANT: The encoding is applicable in Java as well if you are returning data which needs to
  *            be encoded. This JSP form takes data from the param1 variable and displays it to the user
  *            as a confirmation before final submission.
+ *
+ *            A hint is provided with the import statement above
  */ 
  %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

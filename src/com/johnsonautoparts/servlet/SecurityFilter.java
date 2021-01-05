@@ -21,8 +21,6 @@ import com.johnsonautoparts.logger.AppLogger;
  *
  */
 public class SecurityFilter implements Filter {
-	private static final String[] REFERERS = {"login.jsp", "comments.jsp"};
-
 	/**
 	 * Called by the web container to indicate to a filter that it is being
 	 * placed into service. The servlet container calls the init method exactly
@@ -55,18 +53,33 @@ public class SecurityFilter implements Filter {
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException {
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse response = (HttpServletResponse) resp;
+		final String SERVER_HOSTNAME="localhost";
 		
-		//validate referer
-		/**
-		if(! isValidRefererForm(request) ) {
-			sendSecurityError(request, response, "Request failed isValidReferer");
-			return;
-		}
-		*/
 		
-		try {			
-            // add all the require security headers
-			ServletUtilities.addSecurityHeaders(response);
+		try {
+			/**
+			 * Project 4, Milestone 2, Task 6
+			 * 
+			 * TITLE: Protect the webapp with security headers
+			 * 
+			 * RISK: Certain headers can help the browser protect the user from attacks:
+			 *       - Limiting the ability to embed the site into a hidden frame (click-jacking)
+			 *       - Change the content-type (MIME Type sniffing)
+			 *       - XSS and data injection attacks
+			 *
+			 * IMPORTANT: Security headers can be injected anywhere the response
+			 *            is available, but care must be taken to account for every flow of the application.
+			 *            Therefore, a class which is always executed, such as a SecurityFilter, is a good option
+			 *            since it is processed before the ServletHandler is executed.
+			 *            
+			 *            Also, there is a note from the developer that Cross Origin headers have been relaxed,
+			 *            this error needs to be fixed as well.
+			 */
+            // AJAX problems so add headers to relax Cross Origin issues
+			// TODO: resolve on the GUI to remove this
+			response.setHeader("Access-Control-Allow-Origin", "*");
+		    response.setHeader("Access-Control-Allow-Credentials", "true");
+		    response.setHeader("Access-Control-Allow-Methods", "GET");
 			
 			
 			// throw an exception if a method other than GET or POST is sent
@@ -88,7 +101,7 @@ public class SecurityFilter implements Filter {
                 return;
 	    	}
 			
-			// forward this request on to the web application
+			// no errors detected so forward to the next filter
 			chain.doFilter(request, response);   
 		} 
 		catch (ServletException se) {
@@ -120,7 +133,7 @@ public class SecurityFilter implements Filter {
 		AppLogger.log("Exception in security filter: " + err);
 		//response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
 		//ServletUtilities.sendError(response, "application error");
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/accessdenied.jsp");
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/jsp/accessdenied.jsp");
 		
 		try {
 			dispatcher.forward(request, response);
@@ -128,31 +141,6 @@ public class SecurityFilter implements Filter {
 		catch(IOException | ServletException e) {
 			AppLogger.log("SecurityFilter failed to forward to accessdenied.jsp: " + e.getMessage());
 		}
-	}
-	
-	
-	/*
-	 * Method to check if the referer is valid and contains the servlet path
-	 * context.
-	 */
-	private boolean isValidRefererForm(HttpServletRequest request) {
-		String referer = request.getHeader("referer");
-		if(referer == null) {
-			//do not test if referer is null
-			return true;
-		}
-		
-		AppLogger.log("SecurityFilter check isValidReferer: " + referer);
-
-		//check all whitelist referers
-		for(String whitelistRefer : REFERERS) {
-			if(referer.contains(whitelistRefer)) {
-				return true;
-			}
-		}
-		
-		//did not match any whitelist so return false
-	    return false;
 	}
 
 }

@@ -30,13 +30,27 @@
       <url-pattern>/app</url-pattern>
    </filter-mapping>
    <!--filter>
-      <filter-name>CSRFValidationFilter</filter-name>
-      <filter-class>com.johnsonautoparts.servlet.CSRFValidationFilter</filter-class>
+      <filter-name>CSRFGuard</filter-name>
+      <filter-class>org.owasp.csrfguard.CsrfGuardFilter</filter-class>
    </filter>
    <filter-mapping>
-      <filter-name>CSRFValidationFilter</filter-name>
+      <filter-name>CSRFGuard</filter-name> 
       <url-pattern>/app</url-pattern>
-   </filter-mapping-->
+   </filter-mapping>
+   <listener>
+      <listener-class>org.owasp.csrfguard.CsrfGuardServletContextListener</listener-class>
+   </listener>
+   <listener>
+      <listener-class>org.owasp.csrfguard.CsrfGuardHttpSessionListener</listener-class>
+   </listener>
+   <context-param>
+      <param-name>Owasp.CsrfGuard.Config</param-name>
+      <param-value>WEB-INF/csrfguard.properties</param-value>
+   </context-param>
+   <context-param>
+      <param-name>Owasp.CsrfGuard.Config.Print</param-name>
+      <param-value>true</param-value>
+   </context-param>
    <servlet>
       <servlet-name>CsrfServlet</servlet-name>
       <servlet-class>org.owasp.csrfguard.servlet.JavaScriptServlet</servlet-class>
@@ -64,5 +78,5 @@
    <servlet-mapping>
       <servlet-name>CsrfServlet</servlet-name>
       <url-pattern>/csrfguard</url-pattern>
-   </servlet-mapping>
+   </servlet-mapping-->
 </web-app>
