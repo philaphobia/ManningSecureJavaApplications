@@ -18,6 +18,10 @@
 				<td>Password</td>
 				<td><input type="password" name="password" /></td>
 			</tr>
+			<tr>
+				<td>Email</td>
+				<td><input type="text" name="email" /></td>
+			</tr>
 		</table>
 		<input type="hidden" name="action" value="login"/>
 		<input type="hidden" name="secure_form" value="true"/>

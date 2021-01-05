@@ -464,7 +464,11 @@ public class Project2 extends Project {
 	 * @return String
 	 */
 	public Document validateXML(String xml) throws AppException {
-		final String xsdPath = "resources/schema.xsd";
+		StringBuilder xsdPath = new StringBuilder();
+		xsdPath.append(System.getProperty( "catalina.base" ) + File.separator);
+		xsdPath.append("webapps" + File.separator + 
+				httpRequest.getServletContext().getContextPath() + File.separator);
+		xsdPath.append("resources/schema.xsd");
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		
@@ -535,7 +539,8 @@ public class Project2 extends Project {
 		//create a path to the webapp
 		StringBuilder webappPath = new StringBuilder();
 		webappPath.append(System.getProperty( "catalina.base" ));
-		webappPath.append(File.separator + "webapps" + File.separator + "SecureCoding" + File.separator);
+		webappPath.append(File.separator + "webapps" + File.separator + 
+				httpRequest.getServletContext().getContextPath() + File.separator);
 
 		if(userPass == null) {
 			throw new AppException("parseXPath given a null value", "application error");

@@ -1,10 +1,12 @@
 package com.johnsonautoparts;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,12 +16,23 @@ import java.text.Normalizer.Form;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathException;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.xpath.XPathVariableResolver;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
@@ -30,6 +43,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
@@ -424,16 +439,26 @@ public class Project4 extends Project {
 	/**
 	 * Project 4, Milestone 2, Task 5
 	 * 
-	 * TITLE: 
+	 * TITLE: Do not redirect to URL from untrusted source
 	 * 
-	 * RISK: 
+	 * RISK: Never redirect users to a URL which contains unsanitized data:
+	 *       "User provided data, such as URL parameters, POST data payloads, or cookies, 
+	 *       should always be considered untrusted and tainted. "
 	 * 
-	 * REF: SonarSource RSPEC-
+	 * REF: SonarSource RSPEC-5146
 	 * 
 	 * @param str
 	 * @return String
 	 */
-	
+	public void redirectUser(String location) throws AppException {
+		try {
+			httpResponse.sendRedirect(location);
+		} 
+		catch (IOException e) {
+			throw new AppException("redirectUser caught exception for location: " + e.getMessage(), "application error");
+		}
+	}
+			
 	
 	/**
 	 * Project 4, Milestone 2, Task 6
@@ -453,6 +478,7 @@ public class Project4 extends Project {
 	 *            The changes to add security headers will be performed in the SecurityFilter class.
 	 */
 	//END Project 4, Milestone 2, Task 6
+	
 	
 	/**
 	 * Project 4, Milestone 3, Task 1
@@ -549,8 +575,71 @@ public class Project4 extends Project {
 	 * 
 	 * @param email
 	 */
-	public void httpServletData(String email) {
+	/**
+	 * Project 4, Milestone 1, Task 1
+	 * 
+	 * TITLE: Do not trust hidden forms
+	 * 
+	 * RISK: While hidden forms are not displayed in the web browser, they can still be manipulated by
+	 *       the user and forged. Hidden forms should be sanitized just like all other data.
+	 * 
+	 * REF: CMU Software Engineering Institute IDS14-J
+	 * 
+	 * @param username
+	 * @param password
+	 * @param secureForm
+	 * @return boolean
+	 */
+	public String emailLogin(String email, String password) throws AppException {		
+		StringBuilder webappPath = new StringBuilder();
+		webappPath.append(System.getProperty( "catalina.base" ));
+		webappPath.append(File.separator + "webapps" + File.separator + 
+				httpRequest.getServletContext().getContextPath() + File.separator);
 		
+		//make sure the string is not null
+		if(email == null || password == null) {
+			throw new AppException("emailLogin given a null value", "application error");
+		}
+
+		try {
+			String passHash = encryptPassword(password);
+			
+			String userDbPath = webappPath.toString() + "resources/users.xml";
+			
+			//load the users xml file
+			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+			domFactory.setNamespaceAware(true);
+			DocumentBuilder builder = domFactory.newDocumentBuilder();
+			Document doc = builder.parse(userDbPath);
+
+			//create an XPath for the expression
+			XPathFactory factory = XPathFactory.newInstance();
+			XPath xpath = factory.newXPath();
+			
+			//create an instance of our custom resolver to add variables and set it to the xpath
+			MapVariableResolver resolver = new MapVariableResolver();
+			xpath.setXPathVariableResolver(resolver);
+			
+			//create the xpath expression with variables and map variables
+			XPathExpression expression = xpath.compile("//users/user[email/text()=$email and password/text()=$password]");
+			resolver.addVariable(null, "email", email);
+			resolver.addVariable(null, "password", passHash);
+
+			//login failed if no element was found
+			if( expression.evaluate(doc, XPathConstants.NODE) == null) {
+            	throw new AppException("logon failed with email: " + email, "application error");
+            }
+			else {
+				return("logon success with email: " + email);
+			}
+		}
+		catch(ParserConfigurationException | SAXException | XPathException xmle) {
+			throw new AppException("emailLogin caught exception: " + xmle.getMessage(), "application error");
+		}
+		catch(IOException ioe) {
+			throw new AppException("emailLogin caught IO exception: " + ioe.getMessage(), "application error");
+		}
+
 	}
 	
 	
@@ -630,4 +719,77 @@ public class Project4 extends Project {
 		}
 	}
 	
+	
+	/**
+	 * Project 4, Milestone 4, Task 1
+	 * 
+	 * TITLE: Manage 3rd party libraries with Software Composition Analysis (SCA)
+	 * 
+	 * RISK: Including 3rd party libraries in a webapp may make it vulnerable especially if
+	 *       the library can be accessed or caused to be used with the existing webapp.
+	 *       
+	 * IMPORTANT: No changes are required in this file. The SCA analysis reviews the 3rd 
+	 *            party JAR files included.
+	 */
+	//END Project 4, Milestone 4, Task 1
+	
+	
+	
+	/**
+	 * IMPORTANT: NO CODE NEEDS TO BE CHANGED BELOW THIS POINT
+	 */
+	
+	
+	/** The following method does not need to be assessed in the project and is only here as a helper function
+	 * 
+	 * Code copied from: https://rgagnon.com/javadetails/java-0596.html
+	 * 
+	 */
+	private static class MapVariableResolver implements XPathVariableResolver {
+		private Hashtable variables = new Hashtable();
+
+		public void addVariable(String namespaceURI, String localName, Object value) {
+			addVariable(new QName(namespaceURI, localName), value);
+		}
+
+		public void addVariable(QName name, Object value) {
+			variables.put(name, value);
+		}
+
+		public Object resolveVariable(QName name) {
+			Object retval = variables.get(name);
+			return retval;
+		}
+	}
+	
+	/**
+	 * The following method does not need to be assessed in the project and is only here as a helper function
+	 * 
+	 * Code copied from: https://rgagnon.com/javadetails/java-0596.html
+	 * 
+	 * @param b
+	 * @return String
+	 */
+	private static String encryptPassword(String password) throws AppException {
+		
+	    try {
+	    	//get an instance of the SHA-1 algo
+	        MessageDigest crypt = MessageDigest.getInstance("SHA-1");
+	        crypt.reset();
+	        crypt.update(password.getBytes(StandardCharsets.UTF_8));
+	        
+	        byte[] b = crypt.digest();
+	        
+			String sha1 = "";
+			for (int i=0; i < b.length; i++) {
+				sha1 += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+			}
+			
+	        return sha1;
+	    }
+	    catch(NoSuchAlgorithmException nse) {
+	        throw new AppException("encryptPassword got algo exception: " + nse.getMessage(), "application error");
+	    }
+
+	}
 }

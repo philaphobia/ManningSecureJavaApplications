@@ -36,6 +36,10 @@ import com.johnsonautoparts.logger.AppLogger;
 public class ServletHandler extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	//keep track of previous email address for verification
+	private String lastEmailAddr="none@doesnotexist.com";
+	
+	
   	/**
   	 * @see HttpServlet#HttpServlet()
   	 */
@@ -104,6 +108,8 @@ public class ServletHandler extends HttpServlet {
   		switch(action) {
   		//handle login request
   		case "login":
+  			String loginResponse="";
+  			
   			try {
   				Map<String,String> loginParams = parseLoginParams(request);
 
@@ -112,7 +118,7 @@ public class ServletHandler extends HttpServlet {
   				Project4 project4 = new Project4(connection, request, response);
   				
   				//call login
-  				responseContent = project4.login(loginParams.get("username"), loginParams.get("password"), loginParams.get("secure_form"));
+  				loginResponse = project4.login(loginParams.get("username"), loginParams.get("password"), loginParams.get("secure_form"));
   			}
   			catch(AppException ae) {
   	  			AppLogger.log("POST login caught AppException: " + ae.getPrivateMessage());
@@ -121,9 +127,53 @@ public class ServletHandler extends HttpServlet {
   	  			return;
   			}
   		
+  			//build response object
+  	 		JsonObject loginResponseOk = Json.createObjectBuilder()
+					.add("status", "ok")
+					.add("message", loginResponse)
+					.build();
+  	 		responseContent = loginResponseOk.toString();
+		
   			//send successful response
   			PrintWriter outLogin = response.getWriter();
   			outLogin.println(responseContent);
+  			
+  			break;
+  	
+  			
+  		case "email_login":
+  			String emailLoginResponse="";
+  			
+  			try {
+  				Map<String,String> loginParams = parseLoginParams(request);
+
+  				//create the project4 instance
+  				Connection connection = getConnection(request);
+  				Project4 project4 = new Project4(connection, request, response);
+  				
+  				//store the email to use later
+  				lastEmailAddr = loginParams.get("email");
+  				
+  				//call login
+  				emailLoginResponse = project4.emailLogin(loginParams.get("email"), loginParams.get("password"));
+  			}
+  			catch(AppException ae) {
+  	  			AppLogger.log("POST email_login caught AppException: " + ae.getPrivateMessage());
+  	  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+  	  			ServletUtilities.sendError(response, ae.getMessage());
+  	  			return;
+  			}
+  		
+  			//build resonse object
+ 	 		JsonObject emailLoginOk = Json.createObjectBuilder()
+					.add("status", "ok")
+					.add("message", lastEmailAddr + " login success")
+					.build();
+  	 		responseContent = emailLoginOk.toString();
+  	 		
+  			//send successful response
+  			PrintWriter outEmaillLogin = response.getWriter();
+  			outEmaillLogin.println(responseContent);
   			
   			break;
   			
@@ -360,7 +410,7 @@ public class ServletHandler extends HttpServlet {
   			//this.task = params.get("task")[0];
   			params.put("param_value", paramsMap.get("param1")[0]);
   		}
-  		
+
   		return(params);
   	}//end parseParams
 
@@ -381,15 +431,23 @@ public class ServletHandler extends HttpServlet {
   			throw new AppException("no params sent", "missing request parameters");
   		}
 
-  		//username
-  		if(paramsMap.get("username") == null) {
-  			throw new AppException("username param not sent", "missing request parameters");
+  		//login requires email or username so throw error if both are empty
+  		if(paramsMap.get("username") == null && paramsMap.get("email") == null) {
+  			throw new AppException("neither username nor email sent", "missing request parameters");
   		}
-  		else {
+  		
+  		//username
+  		if(paramsMap.get("username") != null) {
   			// avoid parameter overloading attack and only select the first item in the array
   			loginParams.put("username", paramsMap.get("username")[0]);
   		}
 
+  		//email
+  		if(paramsMap.get("email") != null) {
+  			// avoid parameter overloading attack and only select the first item in the array
+  			loginParams.put("email", paramsMap.get("email")[0]);
+  		}
+  		
   		//password
   		if(paramsMap.get("password") == null) {
   			throw new AppException("password param not sent", "missing request parameters");
@@ -400,10 +458,7 @@ public class ServletHandler extends HttpServlet {
   		}
   		
   		//secure_form flag
-  		if(paramsMap.get("secure_form") == null) {
-  			throw new AppException("secure_form param not sent", "missing request parameters");
-  		}
-  		else {
+  		if(paramsMap.get("secure_form") != null) {
   			// avoid parameter overloading attack and only select the first item in the array
   			loginParams.put("secure_form", paramsMap.get("secure_form")[0]);
   		}
