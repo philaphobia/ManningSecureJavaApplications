@@ -23,6 +23,7 @@ import java.util.NoSuchElementException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -157,7 +158,7 @@ public class Project4 extends Project {
             File file=null;
             
             while ( i.hasNext () ) {
-                FileItem fi = (FileItem)i.next();
+                FileItem fi = i.next();
                 
         		String fileName = fi.getName();
                 String contentType = fi.getContentType();
@@ -165,13 +166,13 @@ public class Project4 extends Project {
                 //check if the contentType is accepted
                 boolean contentTypeOk = false;
                 for(String contentTypeCheck : ACCEPTED_CONTENT) {
-                	if(contentTypeCheck == contentType) {
+                	if(contentTypeCheck.equals(contentType)) {
                 		contentTypeOk = true;
                 	}
                 }
                 //throw an exception if one of the accepted content-type was not found
                 if(! contentTypeOk) {
-                	throw new AppException("File was uploaded with a type that is not accepted", "application error");
+                	throw new AppException("File was uploaded with a type that is not accepted");
                 }
                 
                 // Write the file
@@ -189,15 +190,15 @@ public class Project4 extends Project {
             return(true);
 		}
 		catch(FileUploadException fue) {
-            throw new AppException("Upload exception: " + fue.getMessage(), "Application error");
+            throw new AppException("Upload exception: " + fue.getMessage());
 		}
 		catch(NoSuchElementException nsee) {
-            throw new AppException("Iterator caused exception: " + nsee.getMessage(), "Application error");
+            throw new AppException("Iterator caused exception: " + nsee.getMessage());
 		}
 		//catch general Exception breaks the rules but this is the only exception thrown by
 		//FileItem.write() method
 		catch(Exception e) {
-			throw new AppException("FileWrite caused exception: " + e.getMessage(), "Application error");
+			throw new AppException("FileWrite caused exception: " + e.getMessage());
 		}
 	}
 	
@@ -222,7 +223,7 @@ public class Project4 extends Project {
 			String txtField = normField.replaceAll("\\^[0-9A-Za-z_]","");
 			
 			Object val = httpRequest.getSession().getAttribute(txtField);
-			if(val != null && val instanceof String) {
+			if(val instanceof String) {
 				return (String)val;
 			}
 			else {
@@ -286,12 +287,13 @@ public class Project4 extends Project {
 					return("Blog entry accepted");
 				}
 				else {
-					throw new AppException("postBlog() did not insert to table correctly", "application error");
+					throw new AppException("postBlog() did not insert to table correctly");
 				}
 			}
 	   
-		} catch (SQLException se) {
-			throw new AppException("postBlog() caught SQLException: " + se.getMessage(), "application error");
+		} 
+		catch (SQLException se) {
+			throw new AppException("postBlog() caught SQLException: " + se.getMessage());
 		} 
 		finally {
 			try {
@@ -394,12 +396,12 @@ public class Project4 extends Project {
 
 		String referer = httpRequest.getHeader("referer");
 		if(referer == null) {
-			throw new AppException("comments() cannot retrieve referer header", "application error");
+			throw new AppException("comments() cannot retrieve referer header");
 		}
 
 		//check whitelist referer comments form
 		if(!referer.contains(REFERER_COMMENTS)) {
-			throw new AppException("comments() cannot validate referer header", "application error");
+			throw new AppException("comments() cannot validate referer header");
 		}
 
 		try {
@@ -416,12 +418,12 @@ public class Project4 extends Project {
 					return("Comments accepted");
 				}
 				else {
-					throw new AppException("postComments() did not insert to table correctly", "application error");
+					throw new AppException("postComments() did not insert to table correctly");
 				}
 			}
 	   
 		} catch (SQLException se) {
-			throw new AppException("postComments() caught SQLException: " + se.getMessage(), "application error");
+			throw new AppException("postComments() caught SQLException: " + se.getMessage());
 		} 
 		finally {
 			try {
@@ -455,7 +457,7 @@ public class Project4 extends Project {
 			httpResponse.sendRedirect(location);
 		} 
 		catch (IOException e) {
-			throw new AppException("redirectUser caught exception for location: " + e.getMessage(), "application error");
+			throw new AppException("redirectUser caught exception for location: " + e.getMessage());
 		}
 	}
 			
@@ -590,7 +592,7 @@ public class Project4 extends Project {
 	 * @param secureForm
 	 * @return boolean
 	 */
-	public String emailLogin(String email, String password) throws AppException {		
+	public boolean emailLogin(String email, String password) throws AppException {		
 		StringBuilder webappPath = new StringBuilder();
 		webappPath.append(System.getProperty( "catalina.base" ));
 		webappPath.append(File.separator + "webapps" + File.separator + 
@@ -598,7 +600,7 @@ public class Project4 extends Project {
 		
 		//make sure the string is not null
 		if(email == null || password == null) {
-			throw new AppException("emailLogin given a null value", "application error");
+			throw new AppException("emailLogin given a null value");
 		}
 
 		try {
@@ -608,6 +610,8 @@ public class Project4 extends Project {
 			
 			//load the users xml file
 			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
+			domFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			domFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 			domFactory.setNamespaceAware(true);
 			DocumentBuilder builder = domFactory.newDocumentBuilder();
 			Document doc = builder.parse(userDbPath);
@@ -627,17 +631,17 @@ public class Project4 extends Project {
 
 			//login failed if no element was found
 			if( expression.evaluate(doc, XPathConstants.NODE) == null) {
-            	throw new AppException("logon failed with email: " + email, "application error");
+            	return false;
             }
 			else {
-				return("logon success with email: " + email);
+				return true;
 			}
 		}
 		catch(ParserConfigurationException | SAXException | XPathException xmle) {
-			throw new AppException("emailLogin caught exception: " + xmle.getMessage(), "application error");
+			throw new AppException("emailLogin caught exception: " + xmle.getMessage());
 		}
 		catch(IOException ioe) {
-			throw new AppException("emailLogin caught IO exception: " + ioe.getMessage(), "application error");
+			throw new AppException("emailLogin caught IO exception: " + ioe.getMessage());
 		}
 
 	}
@@ -687,7 +691,7 @@ public class Project4 extends Project {
 			
 			//build the header and body for signing
 			//build the JWT
-			StringBuffer sbJWT = new StringBuffer();
+			StringBuilder sbJWT = new StringBuilder();
 			sbJWT.append(jwtHeader);
 			sbJWT.append(".");
 			sbJWT.append(jwtBody);
@@ -698,10 +702,10 @@ public class Project4 extends Project {
 		    	Mac mac = Mac.getInstance("HmacSHA256");
 		        SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET.getBytes(), "HmacSHA256");
 		        mac.init(secretKeySpec);
-		        hmacMessage = mac.doFinal(sbJWT.toString().getBytes());
+		        hmacMessage = mac.doFinal(sbJWT.toString().getBytes(StandardCharsets.UTF_8));
 		    } 
 		    catch (NoSuchAlgorithmException | InvalidKeyException | IllegalStateException e) {
-		    	throw new AppException("Failed to calculate hmac-sha256", e);
+		    	throw new AppException("Failed to calculate hmac-sha256");
 		    }
 
 			String jwtSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(hmacMessage);
@@ -714,8 +718,7 @@ public class Project4 extends Project {
 			return sbJWT.toString();
 		}
 		catch(JsonException je) {
-			je.printStackTrace();
-			throw new AppException(je);
+			throw new AppException(je.getMessage());
 		}
 	}
 	
@@ -757,8 +760,7 @@ public class Project4 extends Project {
 		}
 
 		public Object resolveVariable(QName name) {
-			Object retval = variables.get(name);
-			return retval;
+			return variables.get(name);
 		}
 	}
 	
@@ -780,15 +782,15 @@ public class Project4 extends Project {
 	        
 	        byte[] b = crypt.digest();
 	        
-			String sha1 = "";
+			StringBuilder sha1 = new StringBuilder();
 			for (int i=0; i < b.length; i++) {
-				sha1 += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+				sha1.append(Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 ));
 			}
 			
-	        return sha1;
+	        return sha1.toString();
 	    }
 	    catch(NoSuchAlgorithmException nse) {
-	        throw new AppException("encryptPassword got algo exception: " + nse.getMessage(), "application error");
+	        throw new AppException("encryptPassword got algo exception: " + nse.getMessage());
 	    }
 
 	}

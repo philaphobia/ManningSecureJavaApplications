@@ -106,8 +106,6 @@ public class SecurityFilter implements Filter {
 		} 
 		catch (ServletException se) {
 			sendSecurityError(request, response, se.getMessage());
-			// return without forwarding to the next filter to stop
-            return;
 		}
 	}
 

@@ -39,7 +39,7 @@ public class DB {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver").getDeclaredConstructor().newInstance();
             
             //build the connection string to the file in the webapp
-            StringBuffer jdbcStrBuff = new StringBuffer();
+            StringBuilder jdbcStrBuff = new StringBuilder();
             jdbcStrBuff.append("jdbc:derby:");
             jdbcStrBuff.append(System.getProperty("catalina.home") + File.separator + "webapps" + 
             		context.getContextPath() + File.separator + "db");

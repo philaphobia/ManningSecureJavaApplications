@@ -12,23 +12,19 @@ package com.johnsonautoparts.exception;
  */
 public class AppException extends Exception {
 	private static final long serialVersionUID = 1L;
-	private String privateMessage;
+	private static final String PUBLIC_MESSAGE="application error";
+	private final String privateMessage;
 	
-	public AppException() {}
-	
+	public AppException (String privateMessage) {
+		super(PUBLIC_MESSAGE);
+		this.privateMessage = privateMessage;
+	}
+
 	public AppException (String privateMessage, String publicMessage) {
 		super(publicMessage);
 		this.privateMessage = privateMessage;
 	}
-	
-	public AppException (Throwable cause) {
-		super(cause);
-	}
-	
-	public AppException (String message, Throwable cause) {
-		super(message, cause);
-	}
-	
+
 	public String getPrivateMessage() {
 		return privateMessage;
 	}

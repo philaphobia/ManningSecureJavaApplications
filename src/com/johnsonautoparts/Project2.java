@@ -73,7 +73,7 @@ public class Project2 extends Project {
 	 */
 	public int dbInventory(String id) throws AppException {
 		if (connection == null) {
-	        throw new AppException("dbQuery had stale connection","application error");
+	        throw new AppException("dbQuery had stale connection");
 		}
 
 		//execute the SQL and return the count of the inventory
@@ -87,13 +87,13 @@ public class Project2 extends Project {
 						return rs.getInt(1);
 					}
 					else {
-						throw new AppException("dbInventory did not return any results", "application error");
+						throw new AppException("dbInventory did not return any results");
 					}
 				}//end resultset
 			}//end stmt
 	   
 		} catch (SQLException se) {
-			throw new AppException("dbInventory caught SQLException: " + se.getMessage(), "application error");
+			throw new AppException("dbInventory caught SQLException: " + se.getMessage());
 		} 
 		finally {
 			try {
@@ -125,7 +125,7 @@ public class Project2 extends Project {
 	 */
 	public int dbTasks(String taskName) throws AppException {
 		if (connection == null) {
-	        throw new AppException("dbTasks had stale connection","application error");
+	        throw new AppException("dbTasks had stale connection");
 		}
 		
 		//execute the SQL and return the count of the tasks
@@ -138,13 +138,13 @@ public class Project2 extends Project {
 						return rs.getInt(1);
 					}
 					else {
-						throw new AppException("dbTasks did not return any results", "application error");
+						throw new AppException("dbTasks did not return any results");
 					}
 				}//end resultset
 			}//end preparedstatement
 	   
 		} catch (SQLException se) {
-			throw new AppException("dbTasks caught SQLException: " + se.getMessage(), "application error");
+			throw new AppException("dbTasks caught SQLException: " + se.getMessage());
 		} 
 		finally {
 			try {
@@ -181,7 +181,7 @@ public class Project2 extends Project {
 		
 		//make sure session_data contains data
 		if( session.getAttribute("session_data") == null) {
-			throw new AppException("session_data is empty", "application error");
+			throw new AppException("session_data is empty");
 		}
 		
 		//make sure session_data is text
@@ -189,7 +189,7 @@ public class Project2 extends Project {
 			content = (String)session.getAttribute("session_data");
 		}
 		else {
-			throw new AppException("session_data does not contain text", "application error");
+			throw new AppException("session_data does not contain text");
 		}
 		
 
@@ -200,13 +200,9 @@ public class Project2 extends Project {
 		 */
 		//full path to file to be created
 		String filePath = null;
-		try {
-			//check the path
-			filePath = makeSafePath(tempPath + fileName);
-		}
-		catch(IOException ioe) {
-			throw new AppException("makeSafePath threw an IO error: " + ioe.getMessage(), "application error");
-		}
+		
+		//check the path
+		filePath = makeSafePath(tempPath + fileName);
 
 		
 		//write the session_data content to the file
@@ -215,10 +211,10 @@ public class Project2 extends Project {
 			out.write(content.getBytes(StandardCharsets.UTF_8));
 		}
 		catch(FileNotFoundException fnfe) {
-			throw new AppException("createFile caught file not found: " + fnfe.getMessage(), "application error");
+			throw new AppException("createFile caught file not found: " + fnfe.getMessage());
 		}
 		catch(IOException ioe) {
-			throw new AppException("createFile caught IO error: " + ioe.getMessage(), "application error");
+			throw new AppException("createFile caught IO error: " + ioe.getMessage());
 		}
 
 	}
@@ -238,7 +234,7 @@ public class Project2 extends Project {
 	 * @param str
 	 * @return String 
 	 */
-	public String makeSafePath(String dirty) throws IOException {
+	public String makeSafePath(String dirty) {
 		return dirty.replaceAll("\\.\\." + File.separator,"_");
 	}
 	
@@ -299,18 +295,18 @@ public class Project2 extends Project {
 				
 			}//end try zis
 			catch(IllegalStateException ise) {
-				throw new AppException("unzip caught strange behavior on zip file: " + ise.getMessage(), "application error");
+				throw new AppException("unzip caught strange behavior on zip file: " + ise.getMessage());
 			}
 			catch(IOException ioe) {
-				throw new AppException("unzip caught IO error: " + ioe.getMessage(), "application error");
+				throw new AppException("unzip caught IO error: " + ioe.getMessage());
 			}
 			
 		}//end fis
 		catch (FileNotFoundException fnfe) {
-			throw new AppException("unzip caught file not found exception: " + fnfe.getMessage(), "application error");
+			throw new AppException("unzip caught file not found exception: " + fnfe.getMessage());
 		}
 		catch (IOException ioe) {
-			throw new AppException("unzip caught IO error: " + ioe.getMessage(), "application error");
+			throw new AppException("unzip caught IO error: " + ioe.getMessage());
 		}
 
 		//diretory to the extracted zip
@@ -340,7 +336,7 @@ public class Project2 extends Project {
 	    
 			//throw error if any return code other than zero
 			if (result != 0) {
-				throw new AppException("process error: " + result, "application error");
+				throw new AppException("process error: " + result);
 			}
 			InputStream in = proc.getInputStream();
 	    	
@@ -355,10 +351,10 @@ public class Project2 extends Project {
 			return strBuilder.toString();
 		}
 		catch(IOException ioe) {
-			throw new AppException("exec caught IO error: " + ioe.getMessage(), "application error");
+			throw new AppException("exec caught IO error: " + ioe.getMessage());
 		}
 		catch(InterruptedException ie) {
-			throw new AppException("exec caught interupted error: " + ie.getMessage(), "application error");
+			throw new AppException("exec caught interupted error: " + ie.getMessage());
 		}
 	}
 	
@@ -385,7 +381,7 @@ public class Project2 extends Project {
 			
 			//make sure data was returned
 			if(ret == null) {
-				throw new AppException("ScriptEngine in evalScript returned null", "application error");
+				throw new AppException("ScriptEngine in evalScript returned null");
 			}
 			
 			//return the data but only if the contents are a string
@@ -394,11 +390,11 @@ public class Project2 extends Project {
 			}
 			
 			else {
-				throw new AppException("Unknown object returned from evalScript: " + ret.getClass().toString(), "application error");
+				throw new AppException("Unknown object returned from evalScript: " + ret.getClass().toString());
 			}
 		}
 		catch(ScriptException se) {
-			throw new AppException("evalScript caugth ScriptException: " + se.getMessage(), "application error");
+			throw new AppException("evalScript caugth ScriptException: " + se.getMessage());
 		}
 	}
 	
@@ -435,13 +431,13 @@ public class Project2 extends Project {
 			doc = builder.parse(is);
 		}
 		catch(SAXException se) {
-			throw new AppException("createXML could not validate XML: " + se.getMessage(), "application error");
+			throw new AppException("createXML could not validate XML: " + se.getMessage());
 		}
 		catch(ParserConfigurationException pce) {
-			throw new AppException("createXML caught parser exception: " + pce.getMessage(), "application error");
+			throw new AppException("createXML caught parser exception: " + pce.getMessage());
 		}
 		catch(IOException ioe) {
-			throw new AppException("createXML caught IO exception: " + ioe.getMessage(), "application error");
+			throw new AppException("createXML caught IO exception: " + ioe.getMessage());
 		}
 		
 		//set the response header and return the XML
@@ -476,14 +472,14 @@ public class Project2 extends Project {
 		//purposes to work with XML schema validation
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			InputSource is = new InputSource(new String(xml));
+			InputSource is = new InputSource(xml);
 			return builder.parse(is);
 		}
 		catch(ParserConfigurationException | SAXException xmle) {
-			throw new AppException("validateXML caught exception: " + xmle.getMessage(), "application error");
+			throw new AppException("validateXML caught exception: " + xmle.getMessage());
 		}
 		catch(IOException ioe) {
-			throw new AppException("validateXML caught IO exception: " + ioe.getMessage(), "application error");
+			throw new AppException("validateXML caught IO exception: " + ioe.getMessage());
 		}
 	}
 	
@@ -508,14 +504,14 @@ public class Project2 extends Project {
 		//purposes to configure the parse to avoid XEE attacks
 		try {
 			DocumentBuilder builder = factory.newDocumentBuilder();
-			InputSource is = new InputSource(new String(xml));
+			InputSource is = new InputSource(xml);
 			return builder.parse(is);
 		}
 		catch(ParserConfigurationException | SAXException xmle) {
-			throw new AppException("validateXML caught exception: " + xmle.getMessage(), "application error");
+			throw new AppException("validateXML caught exception: " + xmle.getMessage());
 		}
 		catch(IOException ioe) {
-			throw new AppException("validateXML caught IO exception: " + ioe.getMessage(), "application error");
+			throw new AppException("validateXML caught IO exception: " + ioe.getMessage());
 		}
 	}
 	
@@ -543,7 +539,7 @@ public class Project2 extends Project {
 				httpRequest.getServletContext().getContextPath() + File.separator);
 
 		if(userPass == null) {
-			throw new AppException("parseXPath given a null value", "application error");
+			throw new AppException("parseXPath given a null value");
 		}
 		try {
 			//split the user and password string which was concatenated with a colon
@@ -573,10 +569,10 @@ public class Project2 extends Project {
 			return (nodes.getLength() >= 1);
 		}
 		catch(ParserConfigurationException | SAXException | XPathException xmle) {
-			throw new AppException("xpathLogin caught exception: " + xmle.getMessage(), "application error");
+			throw new AppException("xpathLogin caught exception: " + xmle.getMessage());
 		}
 		catch(IOException ioe) {
-			throw new AppException("xpathLogin caught IO exception: " + ioe.getMessage(), "application error");
+			throw new AppException("xpathLogin caught IO exception: " + ioe.getMessage());
 		}
 	}
 	
@@ -599,7 +595,7 @@ public class Project2 extends Project {
 	 */
 	public Object deserializedObject(String base64Str) throws AppException {
 		if(base64Str == null) {
-			throw new AppException("deserializeObject received null base64 string", "application error");
+			throw new AppException("deserializeObject received null base64 string");
 		}
 		
 		//decode the base64 string
@@ -608,7 +604,7 @@ public class Project2 extends Project {
 			decodedBytes = Base64.getDecoder().decode(base64Str);
 		}
 		catch(IllegalArgumentException iae) {
-			throw new AppException("deserializeObject caught exception decoding base64: " + iae.getMessage(), "application error");
+			throw new AppException("deserializeObject caught exception decoding base64: " + iae.getMessage());
 		}
 		
 	    //deserialize the object
@@ -619,15 +615,15 @@ public class Project2 extends Project {
 	    		return ois.readObject();
 	    	}
 	    	catch(StreamCorruptedException sce) {
-	    		throw new AppException("deserializedObject caugh stream exception: " + sce.getMessage(), "application error");
+	    		throw new AppException("deserializedObject caugh stream exception: " + sce.getMessage());
 	    	}
 	    	catch(ClassNotFoundException | InvalidClassException ce) {
-	    		throw new AppException("deserializedObject caugh class exception: " + ce.getMessage(), "application error");
+	    		throw new AppException("deserializedObject caugh class exception: " + ce.getMessage());
 	    	}
 
 	    }
 	    catch(IOException ioe) {
-	    	throw new AppException("deserializedObject caugh IO exception: " + ioe.getMessage(), "application error");
+	    	throw new AppException("deserializedObject caugh IO exception: " + ioe.getMessage());
 	    }
 
 	}
@@ -651,15 +647,15 @@ public class Project2 extends Project {
 	        
 	        byte[] b = crypt.digest();
 	        
-			String sha1 = "";
+			StringBuilder sha1 = new StringBuilder();
 			for (int i=0; i < b.length; i++) {
-				sha1 += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+				sha1.append(Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 ));
 			}
 			
-	        return sha1;
+	        return sha1.toString();
 	    }
 	    catch(NoSuchAlgorithmException nse) {
-	        throw new AppException("encryptPassword got algo exception: " + nse.getMessage(), "application error");
+	        throw new AppException("encryptPassword got algo exception: " + nse.getMessage());
 	    }
 
 	}

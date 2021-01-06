@@ -61,7 +61,7 @@ public class SessionListener implements HttpSessionListener {
 			
 				//destroy the db connection
 				Object connObj = session.getAttribute("connection");
-				if( connObj != null && connObj instanceof Connection ) {
+				if( connObj instanceof Connection ) {
 					Connection connection = (Connection) connObj;
 					AppLogger.log("Closing DB connection for ID: " + session.getId());
 					

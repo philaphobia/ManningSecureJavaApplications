@@ -80,7 +80,7 @@ public class Project3 extends Project {
 			AppLogger.log("login IO error: " + ioe.getMessage());
 		}
 		catch(ServletException se) {
-			throw new AppException("login exception: " + se.getMessage(), "application error");
+			throw new AppException("login exception: " + se.getMessage());
 		}
 		
 		//reached this far so return true
@@ -196,11 +196,8 @@ public class Project3 extends Project {
 		int accessed=0;
 		
 		//update if it existing or leave as zero
-		if(accessedObj != null) {
-			//no objects accessed yet
-			if(accessedObj instanceof Integer) {
-				accessed = (Integer)accessedObj;
-			}
+		if(accessedObj instanceof Integer) {
+			accessed = (Integer)accessedObj;
 		}
 		
 		//increment the docs_accessed in the session attribute
@@ -217,7 +214,7 @@ public class Project3 extends Project {
 					id = Integer.parseInt(pdfId);
 				}
 				catch(NumberFormatException nfe) {
-					throw new AppException("restoreState failed to parse integer: " + nfe.getMessage(), "application error");
+					throw new AppException("restoreState failed to parse integer: " + nfe.getMessage());
 				}
 			
 				//set the parameter and execute the SQL
@@ -229,14 +226,14 @@ public class Project3 extends Project {
 						return rs.getString(1);
 					}
 					else {
-						throw new AppException("restoreState did not return any results", "application error");
+						throw new AppException("restoreState did not return any results");
 					}
 				}//end resultset
 			}//end statement
 	   
 		} 
 		catch (SQLException se) {
-			throw new AppException("restoreState caught SQLException: " + se.getMessage(), "application error");
+			throw new AppException("restoreState caught SQLException: " + se.getMessage());
 		} 
 		finally {
 			try {
@@ -275,7 +272,7 @@ public class Project3 extends Project {
 			writer = new BufferedWriter(new FileWriter(f.getCanonicalPath()));
 		}
 		catch(IOException ioe) {
-			throw new AppException("flowHandling caught IO exception: " + ioe.getMessage(), "application error");
+			throw new AppException("flowHandling caught IO exception: " + ioe.getMessage());
 		}
 		finally {
 			writer.close();
@@ -380,7 +377,7 @@ public class Project3 extends Project {
 	 */
 	public String deleteFile(String fileName) throws AppException {
 		if(fileName == null) {
-			throw new AppException("deleteFile passed a null variable", "application error");
+			throw new AppException("deleteFile passed a null variable");
 		}
 		
 		fileName.replaceAll("\\.", "_");
@@ -393,7 +390,7 @@ public class Project3 extends Project {
 			return("Deleted file: " + f.getCanonicalPath());
 		} 
 		catch (IOException ioe) {
-			throw new AppException("deleteFile caught IO exception: " + ioe.getMessage(), "application error");
+			throw new AppException("deleteFile caught IO exception: " + ioe.getMessage());
 		}
 	}
 	
@@ -415,7 +412,7 @@ public class Project3 extends Project {
 	public String manipulateString(String str) throws AppException {
 		//check if the value is null or empty before manipulating string
 		if(str == null | str.isEmpty() ) {
-			throw new AppException("manipulate string sent null or empty", "application error");
+			throw new AppException("manipulate string sent null or empty");
 		}
 		
 		String manipulated = str.toUpperCase(Locale.ENGLISH);
@@ -455,10 +452,10 @@ public class Project3 extends Project {
 			return Arrays.toString(data);
 		}
 		catch(FileNotFoundException fnfe) {
-			throw new AppException("detectFileError could not find file: " + fnfe.getMessage(), "application error");
+			throw new AppException("detectFileError could not find file: " + fnfe.getMessage());
 		}
 		catch(IOException ioe) {
-			throw new AppException("detectFileError caught IO exception: " + ioe.getMessage(), "application error");
+			throw new AppException("detectFileError caught IO exception: " + ioe.getMessage());
 		}
 	}
 	
@@ -505,18 +502,20 @@ public class Project3 extends Project {
 			this.session=session;
 		}
 		
-		public void start() {
+		@Override
+		public synchronized void start() {
 			worker = new Thread(this);
 			worker.start();
 		}
 		
+		@Override
 		public void run() {
 			try {
 				//loop until we see the data_id attribute in the session
 				while(! found) {
 					dataId = session.getAttribute("data_id");
 				
-					if(dataId != null && dataId instanceof String) {
+					if(dataId instanceof String) {
 						found=true;
 					}
 					else {
@@ -607,7 +606,7 @@ public class Project3 extends Project {
 			
 		}
 		catch (FileNotFoundException fnfe) {
-			throw new AppException("zip file not found: " + fnfe.getMessage(), "application error");
+			throw new AppException("zip file not found: " + fnfe.getMessage());
 		}
 		//clean up the resources used to open the zip file
 		finally {

@@ -18,7 +18,7 @@ public abstract class Project {
 	protected HttpServletResponse httpResponse=null;
 	protected Connection connection=null;
 	
-	public Project(Connection connection, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+	protected Project(Connection connection, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 		this.httpRequest = httpRequest;
 		this.httpResponse = httpResponse;
 		this.connection = connection;

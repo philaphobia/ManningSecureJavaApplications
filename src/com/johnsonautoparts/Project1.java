@@ -81,7 +81,7 @@ public class Project1 extends Project {
 		Calendar cal =new GregorianCalendar();
 		
 		//return the string with the calendar entry
-		return String.format(str + " passed on date %t", cal);
+		return String.format(str + " passed on date %tF", cal);
 	}
 	
 	
@@ -114,9 +114,7 @@ public class Project1 extends Project {
 	    }
 	 
 	    // Deletes noncharacter code points
-	    String cleanStr = s.replaceAll("[\\p{Cn}]", "");
-	    
-		return cleanStr;
+	    return s.replaceAll("[\\p{Cn}]", "");
 	}
 	
 	
@@ -180,7 +178,7 @@ public class Project1 extends Project {
 	public boolean internationalization(String str) throws AppException {
 		//check for script tag
 		if (str.toLowerCase().contains("script")) {
-		    throw new AppException("internationalization() found script tag", "application error");
+		    throw new AppException("internationalization() found script tag");
 		}
 	
 		//get the operating system
@@ -201,8 +199,7 @@ public class Project1 extends Project {
 			return true;
 		}
 		catch (IOException ioe) {
-			throw new AppException("IOException in internationaliation(): " + ioe.getMessage(), 
-					"application error");
+			throw new AppException("IOException in internationaliation(): " + ioe.getMessage());
 		}
 	}
 	
@@ -272,7 +269,7 @@ public class Project1 extends Project {
 	 */
 	public String variableWidthEncoding(String str) throws AppException {
 		File readFile = new File(str);
-		String readStr = "";
+		StringBuilder readSb = new StringBuilder();
 		
 		//read the file contents
 		try (FileInputStream fios = new FileInputStream(readFile) ) {
@@ -282,7 +279,7 @@ public class Project1 extends Project {
 			
 			//append the data into the string
 			while ((bytesRead = fios.read(data, offset, data.length - offset)) != -1) {
-				readStr += new String(data, offset, bytesRead);
+				readSb.append( new String(data, offset, bytesRead) );
 			    offset += bytesRead;
 			    if (offset >= data.length) {
 			    	throw new IOException("Too much input");
@@ -290,10 +287,10 @@ public class Project1 extends Project {
 			  }
 		}
 		catch(IOException ioe) {
-			throw new AppException("Caught exception reading file: " + ioe.getMessage(), "application error");
+			throw new AppException("Caught exception reading file: " + ioe.getMessage());
 		}
 		
-		return readStr;
+		return readSb.toString();
 	}
 	
 	
@@ -386,7 +383,7 @@ public class Project1 extends Project {
 			}
 		} 
 		catch (IOException ioe) {
-			throw new AppException("fileEncoding caused exception: " + ioe.getMessage(), "Application error");
+			throw new AppException("fileEncoding caused exception: " + ioe.getMessage());
 		}
 	}
 
@@ -475,7 +472,7 @@ public class Project1 extends Project {
 	    	}
 	    }
 	    catch(NumberFormatException nfe) {
-	    	throw new AppException("comparisonTask caught number exception from user input: " + nfe.getMessage(), "application error");
+	    	throw new AppException("comparisonTask caught number exception from user input: " + nfe.getMessage());
 	    }
 	}
 	
@@ -496,7 +493,7 @@ public class Project1 extends Project {
 	 */
 	public boolean numStringCompare(int num) {
 
-		String s = Double.valueOf(num / 1000.0).toString();
+		String s = Double.toString(num / 1000.0);
 
 		//check for comparison to validate
 		if (s.equals("0.001")) {
