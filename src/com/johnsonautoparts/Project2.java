@@ -174,22 +174,23 @@ public class Project2 extends Project {
 	 * @return String
 	 */
 	public void createFile(String fileName) throws AppException {
+		final String SESSION_DATA="session_data";
 		final String tempPath = "temp" + File.pathSeparator + "upload" + File.pathSeparator;
 		
 		HttpSession session = httpRequest.getSession();
 		String content = null;
 		
 		//make sure session_data contains data
-		if( session.getAttribute("session_data") == null) {
-			throw new AppException("session_data is empty");
+		if( session.getAttribute(SESSION_DATA) == null) {
+			throw new AppException(SESSION_DATA + " is empty");
 		}
 		
 		//make sure session_data is text
-		if(session.getAttribute("session_data") instanceof String) {
-			content = (String)session.getAttribute("session_data");
+		if(session.getAttribute(SESSION_DATA) instanceof String) {
+			content = (String)session.getAttribute(SESSION_DATA);
 		}
 		else {
-			throw new AppException("session_data does not contain text");
+			throw new AppException(SESSION_DATA + " does not contain text");
 		}
 		
 
@@ -462,8 +463,7 @@ public class Project2 extends Project {
 	public Document validateXML(String xml) throws AppException {
 		StringBuilder xsdPath = new StringBuilder();
 		xsdPath.append(System.getProperty( "catalina.base" ) + File.separator);
-		xsdPath.append("webapps" + File.separator + 
-				httpRequest.getServletContext().getContextPath() + File.separator);
+		xsdPath.append("webapps" + httpRequest.getServletContext().getContextPath() + File.separator);
 		xsdPath.append("resources/schema.xsd");
 		
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -535,8 +535,7 @@ public class Project2 extends Project {
 		//create a path to the webapp
 		StringBuilder webappPath = new StringBuilder();
 		webappPath.append(System.getProperty( "catalina.base" ));
-		webappPath.append(File.separator + "webapps" + File.separator + 
-				httpRequest.getServletContext().getContextPath() + File.separator);
+		webappPath.append(File.separator + "webapps" + httpRequest.getServletContext().getContextPath() + File.separator);
 
 		if(userPass == null) {
 			throw new AppException("parseXPath given a null value");
@@ -560,7 +559,7 @@ public class Project2 extends Project {
 			XPath xpath = factory.newXPath();
 			XPathExpression expr = xpath.compile("//users/user[username/text()='" +
 			       username + "' and password/text()='" + passHash + "' ]");
-			
+						
 			//obtain the results
 			Object result = expr.evaluate(doc, XPathConstants.NODESET);
 			NodeList nodes = (NodeList) result;

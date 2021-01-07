@@ -1,6 +1,7 @@
 package com.johnsonautoparts.servlet;
 
 import java.io.*;
+import java.security.SecureRandom;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -15,25 +16,12 @@ import com.johnsonautoparts.logger.AppLogger;
  * 
  */
 public class ServletUtilities {
+
   /**
-   * Add headers for protection based on information from OWASP.
-   *
-   * @param response the response header
+   * Utility class so create private constructor to throw error if the class is instantiated
    */
-  public static void addSecurityHeaders(HttpServletResponse response) {
-	  //click-jacking defense so content cannot be framed from a different website
-	  response.addHeader("X-Frame-Options", "SAMEORIGIN");
-
-	  //forces client to only use content-type sent from server and not try to
-	  //determine the content type by magic sniffing
-	  response.addHeader("X-Content-Type-Options", "nosniff");
-
-	  //stop caching
-	  response.addHeader("Cache-Control", "no-store");
-	  
-	  //Content-Security-Policy
-	  //X-Frame-Options is ignored if CSF defined but some browsers ignore so just set this
-	  response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
+  private ServletUtilities() {
+	  throw new IllegalStateException("Utility class not for instantiaton");
   }
 
 
@@ -65,5 +53,16 @@ public class ServletUtilities {
 	  }
   }
   
+  
+  /**
+   * Create a session key from random
+   */
+  public static byte[] createSecret() {
+	  SecureRandom random = new SecureRandom();
+	  byte[] sharedSecret = new byte[32];
+	  random.nextBytes(sharedSecret);
+	  
+	  return sharedSecret;
+  }
 
 }

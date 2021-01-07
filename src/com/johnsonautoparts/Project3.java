@@ -33,6 +33,7 @@ import javax.servlet.http.HttpSession;
 
 import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
+import com.johnsonautoparts.servlet.SessionConstant;
 
 
 /**
@@ -190,7 +191,7 @@ public class Project3 extends Project {
 	 */
 	public String restoreState(String pdfId) throws AppException {
 		HttpSession session = httpRequest.getSession();
-		Object accessedObj = session.getAttribute("docs_accessed");
+		Object accessedObj = session.getAttribute(SessionConstant.DOCS_ACCESSED);
 		
 		//track number of docs accessed in session
 		int accessed=0;
@@ -201,7 +202,7 @@ public class Project3 extends Project {
 		}
 		
 		//increment the docs_accessed in the session attribute
-		session.setAttribute("docs_accessed", accessed + 1);
+		session.setAttribute(SessionConstant.DOCS_ACCESSED, accessed + 1);
 		
 		//get the content from the database
 		try {

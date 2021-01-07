@@ -84,6 +84,7 @@ public class ServletHandler extends HttpServlet {
 	/**
   	 * Handle POST request
   	 */
+  	@Override
   	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
   		AppLogger.log("Processing POST request");
   		
@@ -106,11 +107,12 @@ public class ServletHandler extends HttpServlet {
 
   		//check the action
   		switch(action) {
-  		//handle login request
-  		case "login":
-  			String loginResponse="";
-  			
+  		
+  		//action xml_login
+  		case "xml_login":
   			try {
+  	  			String loginResponse="";
+  	  			
   				Map<String,String> loginParams = parseLoginParams(request);
 
   				//create the project4 instance
@@ -118,32 +120,31 @@ public class ServletHandler extends HttpServlet {
   				Project4 project4 = new Project4(connection, request, response);
   				
   				//call login
-  				loginResponse = project4.login(loginParams.get("username"), loginParams.get("password"), loginParams.get("secure_form"));
+  				loginResponse = project4.loginXml(loginParams.get("username"), loginParams.get("password"), loginParams.get("secure_form"));
+  				
+  	  			//build response object
+  	  	 		JsonObject loginResponseOk = Json.createObjectBuilder()
+  						.add("status", "ok")
+  						.add("message", loginResponse)
+  						.build();
+  	  	 		responseContent = loginResponseOk.toString();
+  			
+  	  			//send successful response
+  	  			PrintWriter outLogin = response.getWriter();
+  	  			outLogin.println(responseContent);
   			}
   			catch(AppException ae) {
-  	  			AppLogger.log("POST login caught AppException: " + ae.getPrivateMessage());
+  	  			AppLogger.log("POST loginXml caught AppException: " + ae.getPrivateMessage());
   	  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
   	  			ServletUtilities.sendError(response, ae.getMessage());
   	  			return;
   			}
   		
-  			//build response object
-  	 		JsonObject loginResponseOk = Json.createObjectBuilder()
-					.add("status", "ok")
-					.add("message", loginResponse)
-					.build();
-  	 		responseContent = loginResponseOk.toString();
-		
-  			//send successful response
-  			PrintWriter outLogin = response.getWriter();
-  			outLogin.println(responseContent);
-  			
   			break;
   	
   			
+  		//action email_login
   		case "email_login":
-  			//String emailLoginResponse="";
-  			
   			try {
   				Map<String,String> loginParams = parseLoginParams(request);
 
@@ -155,7 +156,7 @@ public class ServletHandler extends HttpServlet {
   				loginEmail = loginParams.get("email");
   				
   				//call login
-  				boolean loginSuccess = project4.emailLogin(loginParams.get("email"), loginParams.get("password"));
+  				boolean loginSuccess = project4.loginEmail(loginParams.get("email"), loginParams.get("password"));
   				
   				//build response object
   	 	 		JsonObject emailLoginOk = null;
@@ -180,13 +181,49 @@ public class ServletHandler extends HttpServlet {
   	  			outEmaillLogin.println(responseContent);
   			}
   			catch(AppException ae) {
-  	  			AppLogger.log("POST email_login caught AppException: " + ae.getPrivateMessage());
+  	  			AppLogger.log("POST loginEmail caught AppException: " + ae.getPrivateMessage());
   	  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
   	  			ServletUtilities.sendError(response, ae.getMessage());
   	  			return;
   			}
   		
   			break;
+  			
+  			
+  		//action ldap_login
+  		case "ldap_login":
+  			
+  			try {
+  				String loginResponse="";
+  				Map<String,String> loginParams = parseLoginParams(request);
+
+  				//create the project4 instance
+  				Connection connection = getConnection(request);
+  				Project4 project4 = new Project4(connection, request, response);
+  				
+  				//call login
+  				loginResponse = project4.ldapLogin(loginParams.get("username"), loginParams.get("password"));
+  				
+  	  			//build response object
+  	  	 		JsonObject loginResponseOk = Json.createObjectBuilder()
+  						.add("status", "ok")
+  						.add("message", loginResponse)
+  						.build();
+  	  	 		responseContent = loginResponseOk.toString();
+  			
+  	  			//send successful response
+  	  			PrintWriter outLogin = response.getWriter();
+  	  			outLogin.println(responseContent);
+  			}
+  			catch(AppException ae) {
+  	  			AppLogger.log("POST loginLdap caught AppException: " + ae.getPrivateMessage());
+  	  			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+  	  			ServletUtilities.sendError(response, ae.getMessage());
+  	  			return;
+  			}
+  		
+  			break;
+  			
   			
   		//handle file upload request
   		case "file_upload":
@@ -203,7 +240,7 @@ public class ServletHandler extends HttpServlet {
   		  				numFiles = Integer.parseInt(numFilesParam);
   		  			}
   		  			catch(NumberFormatException nfe) {
-  		  				throw new AppException("number_files param was not a number", "application error");
+  		  				throw new AppException("number_files param was not a number");
   		  			}
   		  		}
   		  		
@@ -257,6 +294,7 @@ public class ServletHandler extends HttpServlet {
   	/**
   	 * Handle GET request
   	 */
+  	@Override
   	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
  		AppLogger.log("Processing GET request");
 
@@ -307,33 +345,33 @@ public class ServletHandler extends HttpServlet {
 				}
 				
 				//update the responseData
-				if(response.getContentType() != null) {
-					if(responseData != null) {
-						//check for JSON object returned
-						if(responseData instanceof JsonObject) {
-							responseContent = responseData.toString();
-						}
-						//check for XML data
-						else if(response.getContentType().contains("xml")) {
-							responseContent = responseData.toString();
-						}
-						//return default json data
-						else {
-							JsonObject jsonContent = Json.createObjectBuilder()
-			 					.add("status", "ok")
-			 					.add("message", responseData.toString())
-			 					.build();
-							responseContent = jsonContent.toString();
-						}
+				if(response.getContentType() != null && responseData != null) {
+					//check for JSON object returned
+					if(responseData instanceof JsonObject) {
+						responseContent = responseData.toString();
+					}
+					//check for XML data
+					else if(response.getContentType().contains("xml")) {
+						responseContent = responseData.toString();
+					}
+					//return default json data
+					else {
+						JsonObject jsonContent = Json.createObjectBuilder()
+			 				.add("status", "ok")
+			 				.add("message", responseData.toString())
+			 				.build();
+						responseContent = jsonContent.toString();
 					}
 					//all other responses use the default message
 				}
 
 			}
 			catch(NumberFormatException nfe) {
+				nfe.printStackTrace();
 				throw new AppException("caught NumFormatException: " + nfe.getMessage(), "application error");
 			}
 			catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException iiie) {
+				iiie.printStackTrace();
 				throw new AppException("caught illegal exception: " + iiie.getMessage(), "application error");
 			}
   			
@@ -383,7 +421,7 @@ public class ServletHandler extends HttpServlet {
   		
   		// return an error if the Map is null or empty
   		if(paramsMap == null || paramsMap.isEmpty()) {
-  			throw new AppException("no params sent", "missing request parameters");
+  			throw new AppException("no params sent");
   		}
   		
   		
@@ -445,6 +483,9 @@ public class ServletHandler extends HttpServlet {
 
   		//login with username requires password and secure_form
   		if(paramsMap.get("username") != null) {
+  			AppLogger.log("Processing Login with username");
+  			loginParams.put("username", paramsMap.get("username")[0]);
+  			
   	  		//password
   	  		if(paramsMap.get("password") == null) {
   	  			throw new AppException("password param not sent", "missing request parameters");
@@ -456,7 +497,7 @@ public class ServletHandler extends HttpServlet {
   	  		
   	  		//secure_form flag
   	  		if(paramsMap.get("secure_form") == null) {
-  	  			throw new AppException("password param not sent", "missing request parameters");
+  	  			throw new AppException("secure_form param not sent", "missing request parameters");
   	  		}
   	  		else {
   	  			// avoid parameter overloading attack and only select the first item in the array
@@ -467,12 +508,9 @@ public class ServletHandler extends HttpServlet {
   		}
 
   		//login with email required password
-  		else if(paramsMap.get("username") != null) {
-  			//email
-  			if(paramsMap.get("email") != null) {
-  				// avoid parameter overloading attack and only select the first item in the array
-  				loginParams.put("email", paramsMap.get("email")[0]);
-  			}
+  		else if(paramsMap.get("email") != null) {
+  			AppLogger.log("Processing Login with email");
+  			loginParams.put("email", paramsMap.get("email")[0]);
   			
  	  		//password
   	  		if(paramsMap.get("password") == null) {

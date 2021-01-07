@@ -10,19 +10,23 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -39,16 +43,28 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.json.Json;
 import javax.json.JsonException;
 import javax.json.JsonObject;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.owasp.encoder.Encode;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
+import com.johnsonautoparts.servlet.ServletUtilities;
+import com.johnsonautoparts.servlet.SessionConstant;
 
 
 /**
@@ -85,9 +101,9 @@ public class Project4 extends Project {
 	 * @param username
 	 * @param password
 	 * @param secureForm
-	 * @return boolean
+	 * @return String
 	 */
-	public String login(String username, String password, String secureForm) throws AppException {		
+	public String loginXml(String username, String password, String secureForm) throws AppException {		
 		//Project2 object for xPath login
 		Project2 project2 = new Project2(connection, httpRequest, httpResponse);
 		String userPass = username + ":" + password;
@@ -122,7 +138,6 @@ public class Project4 extends Project {
 	 *            The encoding is applicable in Java as well if you are returning data which needs to
 	 *            be encoded.
 	 */
-
 	//END Project 4, Milestone 1, Task 2
 	
 	
@@ -138,6 +153,8 @@ public class Project4 extends Project {
 	 * REF: CMU Software Engineering Institute IDS56-J
 	 * CODE: https://www.tutorialspoint.com/servlets/servlets-file-uploading.htm
 	 * 
+	 * @param int
+	 * @return boolean
 	 */
 	public boolean fileUpload(int numFiles) throws AppException {
 		final String[] ACCEPTED_CONTENT = {"application/pdf"};
@@ -271,6 +288,8 @@ public class Project4 extends Project {
 	 *            is then closed. This creates a valid HTML with two textareas and JavaScript tags in
 	 *            the middle which executes in the target users browser.
 	 *            
+	 * @param blogEntry
+	 * @return String
 	 */
 	public String postBlog(String blogEntry) throws AppException {
 		try {
@@ -338,9 +357,9 @@ public class Project4 extends Project {
 	 *       process two different responses. The normal sanitization and filtering is usually insufficient,
 	 *       and a whitelist of acceptable values would be the best solution.
 	 * 
-	 * REF: SonarSource RSPEC-
+	 * REF: SonarSource RSPEC-5167
 	 * 
-	 * @param str
+	 * @param header
 	 * @return String
 	 */
 	public String addHeader(String header) {
@@ -389,7 +408,7 @@ public class Project4 extends Project {
 	 * REF: SonarSource RSPEC-2089
 	 * 
 	 * @param comments
-	 * @return int
+	 * @return String
 	 */
 	public String postComments(String comments) throws AppException {
 		final String REFERER_COMMENTS = "comments.jsp";
@@ -449,8 +468,7 @@ public class Project4 extends Project {
 	 * 
 	 * REF: SonarSource RSPEC-5146
 	 * 
-	 * @param str
-	 * @return String
+	 * @param location
 	 */
 	public void redirectUser(String location) throws AppException {
 		try {
@@ -485,118 +503,280 @@ public class Project4 extends Project {
 	/**
 	 * Project 4, Milestone 3, Task 1
 	 * 
-	 * TITLE: 
+	 * TITLE: Do not store authentication information on client 
 	 * 
-	 * RISK: 
+	 * RISK: Storing sensitive information on the client can expose the data to attackers.
 	 * 
-	 * REF: SonarSource RSPEC-
+	 * REF: CMU Software Engineering Institute FIO52-J
 	 * 
 	 * @param str
 	 * @return String
 	 */
+	public String rememberMe(String username) {
+		HttpSession session = httpRequest.getSession();
+		String secretBase64 = null;
+		
+		//get secret key from the session
+		Object secretObj = session.getAttribute(SessionConstant.SECRET);
+		
+		if(secretObj instanceof byte[]) {
+			//convert the secret to base64 text
+			secretBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString( (byte[]) secretObj );
+		}
+		//secret doesn't exist so re-generate
+		else {
+			secretObj = ServletUtilities.createSecret();
+			session.setAttribute(SessionConstant.SECRET, secretObj);
+			
+			secretBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString( (byte[]) secretObj );
+		}
+
+		//add the cookie to the response
+		Cookie loginCookie = new Cookie("rememberme", secretBase64);
+		
+		//make cookie HttpOnly and Secure to protect the data in transit
+		loginCookie.setHttpOnly(true);
+		loginCookie.setSecure(true);
+		//SameSite=Strict is set in the WebContent/META-INF/context.xml
+		
+		//add the cookie to the response
+		httpResponse.addCookie(loginCookie);
+
+		return("rememberme cookie added for " + username);
+	}
 	
 	
 	/**
 	 * Project 4, Milestone 3, Task 2
 	 * 
-	 * TITLE: 
+	 * TITLE: LDAP authentication for bind 
+	 *  
+	 * RISK: LDAP bind without a credential exposes the LDAP store to unauthorized access.
+	 *        Without setting a role for credential access, the LDAP cannot guarantee a limit
+	 *        to the data accessed. Also, LDAP (and any credential store) should only be accessed
+	 *        via encrypted session.
 	 * 
-	 * RISK: 
+	 * REF: SonarSource RSPEC-4433
 	 * 
-	 * REF: SonarSource RSPEC-
-	 * 
-	 * @param str
-	 * @return String
+	 * @return DirContext
 	 */
+	public DirContext getLdapContext() throws NamingException {
+		// Set up the environment for creating the initial context
+		Hashtable<String, Object> env = new Hashtable<>();
+		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+		env.put(Context.PROVIDER_URL, "ldap://localhost:389/o=JohnsonAutoParts");
+
+		// Use anonymous authentication
+		env.put(Context.SECURITY_AUTHENTICATION, "none");
+
+		// Create the initial context and allow NamingException to be thrown
+		return new InitialDirContext(env);
+	}
 	
 	
 	/**
 	 * Project 4, Milestone 3, Task 3
 	 * 
-	 * TITLE: 
+	 * TITLE: Prevent LDAP injection 
 	 * 
-	 * RISK: 
+	 * RISK: If user-controlled data are passed directly in an LDAP query, a malicious user could
+	 *       inject characters which have meaning in a search. For example, if the user sent a
+	 *       username or password which includes the character *, then the query could match multiple 
+	 *       entries and bypass normal authentication.
 	 * 
-	 * REF: SonarSource RSPEC-
+	 * REF: CMU Software Engineering Institute IDS-54J
 	 * 
 	 * @param str
 	 * @return String
 	 */
+	public String ldapLogin(String userSN, String userPassword) throws AppException {
+		DirContext context = null;
+		
+		try {
+			context = getLdapContext();
+			
+			SearchControls sc = new SearchControls();
+			String[] attributeFilter = {"cn", "mail"};
+			sc.setReturningAttributes(attributeFilter);
+			sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+			String base = "dc=johnsonautoparts,dc=com";
+		  
+			// The following resolves to (&(sn=S*)(userPassword=*))     
+			String filter = "(&(sn=" + userSN + ")(userPassword=" + userPassword + "))";
+		  
+			//response string
+			StringBuilder sbResponse = new StringBuilder();
+			sbResponse.append("User: " + userSN);
+			
+			NamingEnumeration<?> results = context.search(base, filter, sc);
+			if (results.hasMore()) {
+				SearchResult sr = (SearchResult) results.next();
+				Attributes attrs = sr.getAttributes();
+				Attribute attr = attrs.get("cn");
+				sbResponse.append("CN: " + attr.toString());
+			}    
+			
+			return(sbResponse.toString());
+		}
+		catch(NamingException ne) {
+			throw new AppException("ldaLogin caught Naming Exception: " + ne.getMessage());
+		}
+		finally {
+			try {
+				if(context != null) {
+					context.close();
+				}
+			}
+			catch(NamingException ne) {
+				AppLogger.log("ldapLogin caught NamingException trying to close: " + ne.getMessage());
+			}
+		}
+	}
 	
 	
 	/**
 	 * Project 4, Milestone 3, Task 4
 	 * 
-	 * TITLE: 
+	 * TITLE: Do not use getRequestedSessionId 
 	 * 
-	 * RISK: 
+	 * RISK: The HttpSession method getRequestedSessionId() uses data from the request to extract the
+	 *       session id instead of the session id on the application server. Since a malicious user can
+	 *       change what data is sent in the request, relying on this value is dangerous especially in
+	 *       a XSS attack where the session id was stolen from a legitimate user of the system. For
+	 *       example, the follow request would return true since the session id sent in the request
+	 *       is in the database for the role admin:
 	 * 
-	 * REF: SonarSource RSPEC-
+	 *       curl -v -b "JSESSIONID=ED0850AD19EF0FF59651BAC7FC2662AZ" 
+	 *            "http://localhost:8080/SecureCoding/app?project=project4&task=isRoleValid&param1=admin"
+	 * 
+	 * REF: SonarSource RSPEC-2647
 	 * 
 	 * @param str
 	 * @return String
 	 */
+	public boolean isRoleValid(String role) throws AppException {
+		//check for null parameter first
+		if(role == null) {
+			throw new AppException("Role is null");
+		}
+		
+		//get the session id to validate role
+		String sessionId = httpRequest.getRequestedSessionId();
+		
+		try {
+			//get the role of a row in the sessions tables that matches the session id
+			String sql = "SELECT role FROM sessions WHERE id = ?";
+			
+			try (PreparedStatement stmt = connection.prepareStatement(sql) ) {
+			
+				//set the parameter and execute the SQL
+				stmt.setString(1, sessionId);
+				try (ResultSet rs = stmt.executeQuery() ) {
+		    
+					//check if any results returned
+					if (rs.next()) {
 	
+						//false if we have a problem getting the role
+						String sessionRole = rs.getString(1);
+						if(sessionRole == null) {
+							return false;
+						}
+						
+						//check if the requested and db role are the same
+						return( role.equals(sessionRole) );
+					}
+					//false if no results return which means no session in the db
+					else {
+						return(false);
+					}
+				}//end resultset
+			}//end statement
+	   
+		} 
+		catch (SQLException se) {
+			throw new AppException("isRoleValid caught SQLException: " + se.getMessage());
+		} 
+		finally {
+			try {
+				connection.close();
+			} 
+			catch (SQLException se) {
+				//this is an application error but does not represent an error for the user
+				AppLogger.log("isRoleValid failed to close connection: " + se.getMessage());
+			}
+		}
+	}
 	
 	/**
 	 * Project 4, Milestone 3, Task 5
 	 * 
-	 * TITLE: 
+	 * TITLE: Add flags to protect cookies
 	 * 
-	 * RISK: 
+	 * RISK: Multiple flags can be set on cookie to prevent users from transmitting them in the clear,
+	 *       avoid XSS attack, and more.
 	 * 
-	 * REF: SonarSource RSPEC-
+	 * REF: SonarSource RSPEC-2254
 	 * 
 	 * @param str
 	 * @return String
 	 */
+	public String setPrefCookie(String pref) throws AppException {
+		if(pref == null) {
+			throw new AppException("setPrefCookie received null parameter");
+		}
+		
+		//normalize
+		String safePref = Normalizer.normalize(pref, Form.NFKC);
+		
+		//encode to avoid XSS
+		safePref = Encode.forHtml(safePref);
+		safePref = Encode.forJavaScriptBlock(safePref);
+		
+		//create json object
+		JsonObject prefJson = 
+			Json.createObjectBuilder()
+				.add("encoding", "UTF-8")
+				.add("pref", safePref)
+				.build();
+		
+		//encode it for safe characters
+		String encodedToken = Base64.getUrlEncoder().withoutPadding().encodeToString(
+				prefJson.toString().getBytes(StandardCharsets.UTF_8)
+			);
+		
+			
+		//add the cookie to the response
+		Cookie prefCookie = new Cookie("pref", encodedToken);
+		httpResponse.addCookie(prefCookie);
+		
+		//echo pref set 
+		return("set pref " + safePref);
+	}
 	
 	
 	/**
 	 * Project 4, Milestone 3, Task 6
 	 * 
-	 * TITLE: 
-	 * 
-	 * RISK: 
-	 * 
-	 * REF: SonarSource RSPEC-
-	 * 
-	 * @param str
-	 * @return String
-	 */
-	
-	
-	/**
-	 * Project 4, Milestone 3, Task 7
-	 * 
 	 * TITLE: Avoid leaking session data across servlet sessions
 	 * 
-	 * RISK: 
+	 * RISK: A servlet is a singleton class and variables set in the wrong context could be leaked
+	 *       across sessions. Since there can only be one instance of the singleton, data stored in member
+	 *       variables is not guaranteed to be unique.
+	 *       
+	 * IMPORTANT: Changes should not be needed in this method. Review the ServletHandler class and the location
+	 *            of the loginEmail variable. The doPost() method associated with the method below matches the
+	 *            case "email_login" block. The loginEmail variable is used in this block.
 	 * 
 	 * REF: CMU Software Engineering Institute MSC11-J
 	 * 
 	 * @param email
-	 */
-	/**
-	 * Project 4, Milestone 1, Task 1
-	 * 
-	 * TITLE: Do not trust hidden forms
-	 * 
-	 * RISK: While hidden forms are not displayed in the web browser, they can still be manipulated by
-	 *       the user and forged. Hidden forms should be sanitized just like all other data.
-	 * 
-	 * REF: CMU Software Engineering Institute IDS14-J
-	 * 
-	 * @param username
 	 * @param password
-	 * @param secureForm
 	 * @return boolean
 	 */
-	public boolean emailLogin(String email, String password) throws AppException {		
+	public boolean loginEmail(String email, String password) throws AppException {		
 		StringBuilder webappPath = new StringBuilder();
 		webappPath.append(System.getProperty( "catalina.base" ));
-		webappPath.append(File.separator + "webapps" + File.separator + 
-				httpRequest.getServletContext().getContextPath() + File.separator);
+		webappPath.append(File.separator + "webapps" + httpRequest.getServletContext().getContextPath() + File.separator);
 		
 		//make sure the string is not null
 		if(email == null || password == null) {
@@ -629,13 +809,8 @@ public class Project4 extends Project {
 			resolver.addVariable(null, "email", email);
 			resolver.addVariable(null, "password", passHash);
 
-			//login failed if no element was found
-			if( expression.evaluate(doc, XPathConstants.NODE) == null) {
-            	return false;
-            }
-			else {
-				return true;
-			}
+			//return the boolean of the evaluation
+			return( expression.evaluate(doc, XPathConstants.NODE) == null );
 		}
 		catch(ParserConfigurationException | SAXException | XPathException xmle) {
 			throw new AppException("emailLogin caught exception: " + xmle.getMessage());
@@ -648,7 +823,7 @@ public class Project4 extends Project {
 	
 	
 	/**
-	 * Project 4, Milestone 3, Task 8
+	 * Project 4, Milestone 3, Task 7
 	 * 
 	 * TITLE: Securing Java Web Tokens (JWT)
 	 * 
@@ -657,6 +832,7 @@ public class Project4 extends Project {
 	 *       signature verification so the rights can be guaranteed
 	 * 
 	 * @param username
+	 * @return String
 	 */
 
 	public String createJwt(String username) throws AppException {
@@ -690,17 +866,16 @@ public class Project4 extends Project {
 				);
 			
 			//build the header and body for signing
-			//build the JWT
 			StringBuilder sbJWT = new StringBuilder();
 			sbJWT.append(jwtHeader);
 			sbJWT.append(".");
 			sbJWT.append(jwtBody);
 			
-			//create the HMAC signature
+			//create the HMAC SHA-256 signature
 			byte[] hmacMessage = null;
 		    try {		    	
 		    	Mac mac = Mac.getInstance("HmacSHA256");
-		        SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET.getBytes(), "HmacSHA256");
+		        SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
 		        mac.init(secretKeySpec);
 		        hmacMessage = mac.doFinal(sbJWT.toString().getBytes(StandardCharsets.UTF_8));
 		    } 
@@ -708,6 +883,7 @@ public class Project4 extends Project {
 		    	throw new AppException("Failed to calculate hmac-sha256");
 		    }
 
+		    //encode with base64, no padding, and url encode to make sure valid HTTP characters
 			String jwtSignature = Base64.getUrlEncoder().withoutPadding().encodeToString(hmacMessage);
 			
 		    
@@ -739,7 +915,7 @@ public class Project4 extends Project {
 	
 	
 	/**
-	 * IMPORTANT: NO CODE NEEDS TO BE CHANGED BELOW THIS POINT
+	 * IMPORTANT: NO CODE NEEDS TO BE REVIEWED BELOW THIS POINT
 	 */
 	
 	
@@ -749,7 +925,7 @@ public class Project4 extends Project {
 	 * 
 	 */
 	private static class MapVariableResolver implements XPathVariableResolver {
-		private Hashtable variables = new Hashtable();
+		private HashMap<QName,Object> variables = new HashMap<>();
 
 		public void addVariable(String namespaceURI, String localName, Object value) {
 			addVariable(new QName(namespaceURI, localName), value);

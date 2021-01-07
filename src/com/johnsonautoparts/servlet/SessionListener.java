@@ -1,6 +1,5 @@
 package com.johnsonautoparts.servlet;
 
-import java.security.SecureRandom;
 /**
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
  * 
@@ -16,8 +15,6 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import java.lang.IllegalStateException;
-
 import com.johnsonautoparts.db.DB;
 import com.johnsonautoparts.exception.DBException;
 import com.johnsonautoparts.logger.AppLogger;
@@ -29,10 +26,7 @@ public class SessionListener implements HttpSessionListener {
 
 		if(session != null)  {
 			// Generate random 256-bit (32-byte) shared secret and add to session
-			SecureRandom random = new SecureRandom();
-			byte[] sharedSecret = new byte[32];
-			random.nextBytes(sharedSecret);
-			session.setAttribute("secret", sharedSecret);
+			session.setAttribute("secret", ServletUtilities.createSecret());
 
 			//add a connection to the database to session attribute
 			try {
