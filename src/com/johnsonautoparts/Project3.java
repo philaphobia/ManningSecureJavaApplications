@@ -560,14 +560,20 @@ public class Project3 extends Project {
 		final int BUFFER = 512;
 		int count=0;
 		
-		String tempPath = "temp" + File.separator + "zip";
-		String zipPath = tempPath + File.separator + zipFile + File.separator;
+		//create a path to the zipFile
+		Path zipPath=null;
+		try {
+			zipPath = Paths.get("temp","zip","zipFile");
+		}
+		catch(InvalidPathException ipe) {
+			throw new AppException("handleClose received an invalid zipFile path: " + ipe.getMessage());
+		}
 		
 		byte[] data=null;
 		
 		try {
 			//open the zip file
-			fis = new FileInputStream(zipFile);
+			fis = new FileInputStream(zipFile.toString());
 			zis = new ZipInputStream(new BufferedInputStream(fis));
 			ZipEntry entry;
 			

@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -63,8 +66,6 @@ import org.xml.sax.SAXException;
 
 import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
-import com.johnsonautoparts.servlet.ServletUtilities;
-import com.johnsonautoparts.servlet.SessionConstant;
 
 
 /**
@@ -174,7 +175,6 @@ public class Project4 extends Project {
    	
             // Process the uploaded file items
             Iterator<FileItem> i = fileItems.iterator();
-            File file=null;
             
             while ( i.hasNext () ) {
                 FileItem fi = i.next();
@@ -188,18 +188,22 @@ public class Project4 extends Project {
                 }
                 
                 // Write the file
+                Path filePath = null;
                 if( fileName.lastIndexOf(File.separator) >= 0 ) {
-                	file = new File( "upload" + File.separator + fileName.substring( fileName.lastIndexOf(File.separator))) ;
+                	filePath = Paths.get("upload", fileName.substring( fileName.lastIndexOf(File.separator)) );
                 }
                 else {
-                	file = new File( "upload" + File.separator + fileName.substring(fileName.lastIndexOf(File.separator)+1)) ;
+                	filePath = Paths.get("upload", fileName.substring(fileName.lastIndexOf(File.separator)+1));
                 }
                 
-                fi.write( file );
+                fi.write( filePath.toFile() );
             }//end while to process FileItems
             
             //all files uploaded successfully
             return(true);
+		}
+		catch(InvalidPathException ipe) {
+			throw new AppException("fileUpload passed an invalid path");
 		}
 		catch(FileUploadException fue) {
             throw new AppException("Upload exception: " + fue.getMessage());
@@ -809,11 +813,16 @@ public class Project4 extends Project {
 	 * @param password
 	 * @return boolean
 	 */
-	public boolean loginEmail(String email, String password) throws AppException {		
-		StringBuilder webappPath = new StringBuilder();
-		webappPath.append(System.getProperty( "catalina.base" ));
-		webappPath.append(File.separator + "webapps" + httpRequest.getServletContext().getContextPath() + File.separator);
-		
+	public boolean loginEmail(String email, String password) throws AppException {
+		Path userDbPath=null;
+		try {
+			userDbPath = Paths.get(System.getProperty( "catalina.base" ), "webapps",
+				httpRequest.getServletContext().getContextPath(), "resources", "users.xml");
+		}
+		catch(InvalidPathException ipe) {
+			throw new AppException("loginEmail cannot location users.xml: " + ipe.getMessage());
+		}
+
 		//make sure the string is not null
 		if(email == null || password == null) {
 			throw new AppException("emailLogin given a null value");
@@ -822,15 +831,13 @@ public class Project4 extends Project {
 		try {
 			String passHash = encryptPassword(password);
 			
-			String userDbPath = webappPath.toString() + "resources/users.xml";
-			
 			//load the users xml file
 			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 			domFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 			domFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 			domFactory.setNamespaceAware(true);
 			DocumentBuilder builder = domFactory.newDocumentBuilder();
-			Document doc = builder.parse(userDbPath);
+			Document doc = builder.parse(userDbPath.toString());
 
 			//create an XPath for the expression
 			XPathFactory factory = XPathFactory.newInstance();

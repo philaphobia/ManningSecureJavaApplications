@@ -2,6 +2,10 @@ package com.johnsonautoparts;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
@@ -193,8 +197,17 @@ public class Project1 extends Project {
 			fileName = "/dev/null";
 		}
 		
+		//create temp file
+		Path tempFile=null;
+		try {
+			tempFile = Files.createTempFile("", ".tmp");
+		} 
+		catch (IOException ioe) {
+			throw new AppException("IOException in internationaliation(): " + ioe.getMessage());
+		}
+		
 		//write the text to file
-		try (PrintWriter writer = new PrintWriter(new FileWriter(fileName)) ) {
+		try (PrintWriter writer = new PrintWriter(new FileWriter(tempFile.toFile())) ) {
 			writer.printf("Passed text: %s", str);
 			return true;
 		}
@@ -268,11 +281,18 @@ public class Project1 extends Project {
 	 * @return String
 	 */
 	public String variableWidthEncoding(String str) throws AppException {
-		File readFile = new File(str);
+		Path path=null;
+		try {
+			path = Paths.get(str);
+		}
+		catch(InvalidPathException ipe) {
+			throw new AppException("variableWidthEncoding was given and invalid path");
+		}
+		
 		StringBuilder readSb = new StringBuilder();
 		
 		//read the file contents
-		try (FileInputStream fios = new FileInputStream(readFile) ) {
+		try (FileInputStream fios = new FileInputStream(path.toString()) ) {
 			byte[] data = new byte[1024+1];
 			int offset = 0;
 			int bytesRead = 0;
