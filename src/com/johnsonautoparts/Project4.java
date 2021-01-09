@@ -94,7 +94,9 @@ public class Project4 extends Project {
 	 * TITLE: Do not trust hidden forms
 	 * 
 	 * RISK: While hidden forms are not displayed in the web browser, they can still be manipulated by
-	 *       the user and forged. Hidden forms should be sanitized just like all other data.
+	 *       the user and forged. Hidden forms should be sanitized just like all other data. This method
+	 *       is called from ServletHandler under the doPost() method. The secureForm parameter passed here
+	 *       is retrieved from a hidden field in WebContent/jsp/login.jsp
 	 * 
 	 * REF: CMU Software Engineering Institute IDS14-J
 	 * 
@@ -181,14 +183,7 @@ public class Project4 extends Project {
                 String contentType = fi.getContentType();
                 
                 //check if the contentType is accepted
-                boolean contentTypeOk = false;
-                for(String contentTypeCheck : ACCEPTED_CONTENT) {
-                	if(contentTypeCheck.equals(contentType)) {
-                		contentTypeOk = true;
-                	}
-                }
-                //throw an exception if one of the accepted content-type was not found
-                if(! contentTypeOk) {
+                if(! ACCEPTED_CONTENT.equals(contentType)) {
                 	throw new AppException("File was uploaded with a type that is not accepted");
                 }
                 
@@ -339,7 +334,7 @@ public class Project4 extends Project {
 	 *       login request is processed as a GET. If the login goes through a proxy server or other
 	 *       service, the data could also be leaked.
 	 *
-	 * IMPORTANT: No changes are made in this mile for the current task. The changes are made in the
+	 * IMPORTANT: No changes are made in this file for the current task. The changes are made in the
 	 *            ServletHandler by reviewing the doPost() and doGet() methods.
 	 */
 	//END Project 4, Milestone 2, Task 1
@@ -512,37 +507,64 @@ public class Project4 extends Project {
 	 * @param str
 	 * @return String
 	 */
-	public String rememberMe(String username) {
+	public boolean rememberMe(String username) throws AppException {
 		HttpSession session = httpRequest.getSession();
-		String secretBase64 = null;
 		
 		//get secret key from the session
-		Object secretObj = session.getAttribute(SessionConstant.SECRET);
+		String sessionId = session.getId();
 		
-		if(secretObj instanceof byte[]) {
-			//convert the secret to base64 text
-			secretBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString( (byte[]) secretObj );
-		}
-		//secret doesn't exist so re-generate
-		else {
-			secretObj = ServletUtilities.createSecret();
-			session.setAttribute(SessionConstant.SECRET, secretObj);
+		try {
+			//get the role of a row in the sessions tables that matches the session id
+			String sql = "SELECT secret FROM sessions WHERE id = ?";
 			
-			secretBase64 = Base64.getUrlEncoder().withoutPadding().encodeToString( (byte[]) secretObj );
+			try (PreparedStatement stmt = connection.prepareStatement(sql) ) {
+			
+				//set the parameter and execute the SQL
+				stmt.setString(1, sessionId);
+				try (ResultSet rs = stmt.executeQuery() ) {
+		    
+					//check if any results returned
+					if (rs.next()) {
+	
+						//false if we have a problem getting the secret
+						String secret = rs.getString(1);
+						if(secret == null) {
+							return false;
+						}
+						
+						//add the cookie to the response
+						Cookie loginCookie = new Cookie("rememberme", secret);
+						
+						//make cookie HttpOnly and Secure to protect the data in transit
+						loginCookie.setHttpOnly(true);
+						loginCookie.setSecure(true);
+						
+						//add the cookie to the response
+						httpResponse.addCookie(loginCookie);
+
+						return(true);
+					}
+					//false if no results return which means no session in the db
+					else {
+						return(false);
+					}
+				}//end resultset
+			}//end statement
+	   
+		} 
+		catch (SQLException se) {
+			throw new AppException("rememberMe caught SQLException: " + se.getMessage());
+		} 
+		finally {
+			try {
+				connection.close();
+			} 
+			catch (SQLException se) {
+				//this is an application error but does not represent an error for the user
+				AppLogger.log("rememberMe failed to close connection: " + se.getMessage());
+			}
 		}
 
-		//add the cookie to the response
-		Cookie loginCookie = new Cookie("rememberme", secretBase64);
-		
-		//make cookie HttpOnly and Secure to protect the data in transit
-		loginCookie.setHttpOnly(true);
-		loginCookie.setSecure(true);
-		//SameSite=Strict is set in the WebContent/META-INF/context.xml
-		
-		//add the cookie to the response
-		httpResponse.addCookie(loginCookie);
-
-		return("rememberme cookie added for " + username);
 	}
 	
 	
@@ -649,7 +671,7 @@ public class Project4 extends Project {
 	 *       curl -v -b "JSESSIONID=ED0850AD19EF0FF59651BAC7FC2662AZ" 
 	 *            "http://localhost:8080/SecureCoding/app?project=project4&task=isRoleValid&param1=admin"
 	 * 
-	 * REF: SonarSource RSPEC-2647
+	 * REF: SonarSource RSPEC-2254
 	 * 
 	 * @param str
 	 * @return String
