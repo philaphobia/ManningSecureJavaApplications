@@ -321,6 +321,20 @@ public class Project4 extends Project {
 		}
 	}
 
+	/**
+	 * Project 4, Milestone 1, Task 6
+	 * 
+	 * TITLE: Do not add main() method to a webapp
+	 * 
+	 * RISK: A main() method may not be reachable by an attacker, but it should not be included
+	 *       in a production environment. A main() method may also leak sensitive information or
+	 *       allow an attacker with access to the WAR with additional access.
+	 * 
+	 * REF: SonarSource RSPEC-2653
+	 * 
+	 */
+	//END Project 4, Milestone 1, Task 6
+	
 	
 	/**
 	 * Project 4, Milestone 2, Task 1
