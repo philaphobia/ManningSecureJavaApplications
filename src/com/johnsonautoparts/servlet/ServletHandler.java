@@ -29,8 +29,8 @@ import com.johnsonautoparts.logger.AppLogger;
 
 /**
  * Servlet Class registered via the web.xml as the primary class for handling
- * calls for the webapp. The doGet() and doPost() are called in Tomcat and
- * registerd as the handlers in this class.
+ * calls for the webapp. The doGet() and doPost() are called in app server and
+ * registered as the handlers in this class.
  * 
  */
 public class ServletHandler extends HttpServlet {

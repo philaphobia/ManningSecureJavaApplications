@@ -27,7 +27,7 @@
 	 *            is then closed. This creates a valid HTML with two textareas and JavaScript tags in
 	 *            the middle which executes in the target users browser.
 	 *            
-	 *            A hint is provided in the import statements above
+	 *            A hint is provided in the import statements above.
 	 */
 %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -38,6 +38,12 @@
 	<form action="<%=request.getServletContext().getContextPath() %>/app" method='GET'>
 	<table>
 		<tr><td>Please verify your blog post before submission (HTML tags P,TABLE,DIV,TR,TD allowed):</td></tr>
+			<%
+			/**
+			 * The JSP rectries the parameter blog and places the data into the text area for review by
+			 * the user so they can make edits before submitting the data.
+			 */
+			%>
 		<tr><td><textarea name='param1'><%= request.getParameter("blog") %></textarea>
 		<tr><td><br/></td></tr>
 			</table>
