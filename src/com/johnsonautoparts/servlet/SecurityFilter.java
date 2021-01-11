@@ -67,6 +67,8 @@ public class SecurityFilter implements Filter {
 			 *       - Change the content-type (MIME Type sniffing)
 			 *       - XSS and data injection attacks
 			 *
+			 * REF: SonarSource RSPEC-5122
+			 * 
 			 * IMPORTANT: Security headers can be injected anywhere the response
 			 *            is available, but care must be taken to account for every flow of the application.
 			 *            Therefore, a class which is always executed, such as a SecurityFilter, is a good option

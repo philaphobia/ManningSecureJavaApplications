@@ -13,10 +13,10 @@
  * REF: CMU Software Engineering Institute IDS14-J
  * 
  * IMPORTANT: The encoding is applicable in Java as well if you are returning data which needs to
- *            be encoded. This JSP form takes data from the param1 variable and displays it to the user
+ *            be encoded. This JSP form takes data from the comments parameter and displays it to the user
  *            as a confirmation before final submission.
  *
- *            A hint is provided with the import statement above
+ *            A hint is provided with the import statement above.
  */ 
  %>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">

@@ -149,9 +149,12 @@ public class Project4 extends Project {
 	 * 
 	 * TITLE: Avoid arbitrary file uploads
 	 * 
-	 * RISK: The referer header can be manipulated by a user and should be assumed to be tainted data.
-	 *       Since the header is untrusted, it should not be used as a reference source for making
-	 *       security deisions.
+	 * RISK: The content-type of a file upload does not guarantee the content of the data, so it cannot
+	 *       be completely trust. Additional checks of the actual metadata must be performed to validate
+	 *       the data type.
+	 *       
+	 * NOTES: Apache Tika provides this exact service by examining the bytes of data against known signatures
+	 *        an providing an improved review of the data.
 	 * 
 	 * REF: CMU Software Engineering Institute IDS56-J
 	 * CODE: https://www.tutorialspoint.com/servlets/servlets-file-uploading.htm
@@ -160,7 +163,7 @@ public class Project4 extends Project {
 	 * @return boolean
 	 */
 	public boolean fileUpload(int numFiles) throws AppException {
-		final String[] ACCEPTED_CONTENT = {"application/pdf"};
+		final String ACCEPTED_CONTENT = "application/pdf";
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		   
 		// Location to save data that is larger than maxMemSize.
@@ -503,6 +506,8 @@ public class Project4 extends Project {
 	 *       - Change the content-type (MIME Type sniffing)
 	 *       - XSS and data injection attacks
 	 *
+	 * REF: SonarSource RSPEC-5122
+	 * 
 	 * IMPORTANT: No changes are made in this file. The headers can be injected anywhere the response
 	 *            is available, but care must be taken to account for every flow of the application.
 	 *            Therefore, a class which is always executed, such as a SecurityFilter, is a good option
@@ -872,7 +877,10 @@ public class Project4 extends Project {
 	 * 
 	 * RISK: JWT act as an authorization token guaranteeing the users access rights
 	 *       such as an active session and the role. The JWT needs to have a strong
-	 *       signature verification so the rights can be guaranteed
+	 *       signature verification so the rights can be guaranteed. If a malicious user
+	 *       can recreate a token sent to the server with elevated privileges, they
+	 *       could gain unauthorized access to the system. This change could be made
+	 *       if the token can be changed and digitally signed.
 	 * 
 	 * @param username
 	 * @return String
