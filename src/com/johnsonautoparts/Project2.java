@@ -36,6 +36,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
 import com.johnsonautoparts.servlet.SessionConstant;
@@ -653,6 +656,67 @@ public class Project2 extends Project {
 	    	throw new AppException("deserializedObject caugh IO exception: " + ioe.getMessage());
 	    }
 
+	}
+	
+	
+	/**
+	 * Project 2, Milestone 2, Task 6
+	 * 
+	 * 
+	 * TITLE: Deserialized JSON
+	 * 
+	 * RISK: Java should not deserialize untrusted JSON without implementing some controls on the object data.
+	 *       Allowing deserialization of JSON data can lead to code execution, denial of service, and other
+	 *       attacks leveraging third-party libraries just like Java deserialization attacks.
+	 * 
+	 * REF: https://www.nccgroup.com/globalassets/our-research/us/whitepapers/2018/jackson_deserialization.pdf
+	 * 
+	 * @param str
+	 * @return Object
+	 */
+	public Object deserializeJson(String data) throws AppException {
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enableDefaultTyping();
+		
+		//disable default behavior which has been causing problems
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		
+		//deserialize the object and return
+		try {
+			return mapper.readValue(data, Object.class);
+		}
+		catch(IOException ioe) {
+			throw new AppException("deserializationJson caught IOException: " + ioe.getMessage());
+		}
+
+	}
+	
+	
+	/**
+	 * Class for Milestone 2, Task 6
+	 * 
+	 * NO CHANGES NEEDED IN THIS FILE
+	 */
+	public class User {
+		private final int id;
+		private final String username;
+		private final String role;
+		
+		public User(int id, String username, String role) {
+			this.id = id;
+			this.username = username;
+			this.role = role;
+		}
+		
+		int getId() {
+			return this.id;
+		}
+		String getUsername() {
+			return this.username;
+		}
+		String getRole() {
+			return this.role;
+		}
 	}
 	
 	
