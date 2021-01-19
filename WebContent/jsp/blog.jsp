@@ -1,6 +1,6 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="org.owasp.html.PolicyFactory"%>
-<%@page import="org.owasp.html.HtmlPolicyBuilder" %>
+<%@page import="org.owasp.html.HtmlPolicyBuilder"%>
 <%
 	/**
 	 * Project 4, Milestone 1, Task 5
@@ -35,21 +35,28 @@
 <body>
 	<H1>Blog verification for Johnson Autoparts</H1>
 	<br>
-	<form action="<%=request.getServletContext().getContextPath() %>/app" method='GET'>
-	<table>
-		<tr><td>Please verify your blog post before submission (HTML tags P,TABLE,DIV,TR,TD allowed):</td></tr>
+	<form action="<%=request.getServletContext().getContextPath() %>/app"
+		method='GET'>
+		<table>
+			<tr>
+				<td>Please verify your blog post before submission (HTML tags
+					P,TABLE,DIV,TR,TD allowed):</td>
+			</tr>
 			<%
 			/**
 			 * The JSP rectries the parameter blog and places the data into the text area for review by
 			 * the user so they can make edits before submitting the data.
 			 */
 			%>
-		<tr><td><textarea name='param1'><%= request.getParameter("blog") %></textarea>
-		<tr><td><br/></td></tr>
-			</table>
-		<input type='hidden' name='project' value='project4'/>
-		<input type='hidden' name='task' value='postBlog'/>
-		<input type='submit' name='Blog'/>
+			<tr>
+				<td><textarea name='param1'><%= request.getParameter("blog") %></textarea>
+			<tr>
+				<td><br /></td>
+			</tr>
+		</table>
+		<input type='hidden' name='project' value='project4' /> <input
+			type='hidden' name='task' value='postBlog' /> <input type='submit'
+			name='Blog' />
 	</form>
 </body>
 </html>
