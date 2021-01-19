@@ -101,7 +101,7 @@ public class Project3 extends Project {
 	 * REF: CMU Software Engineering Institute ERR01-J
 	 * 
 	 * @param filePath
-	 * @return String
+	 * @return String contents of the file or information about the error
 	 */
 	public String dataExposure(String filePath) {
 		try {
@@ -477,6 +477,8 @@ public class Project3 extends Project {
 	 *              variable which never appears.
 	 * 
 	 * REF: CMU Software Engineering Institute ERR53-J
+	 *      Additional information on pro/con of catching Throwable:
+	 *      https://www.baeldung.com/java-catch-throwable-bad-practice
 	 * 
 	 * @param query
 	 * @return String
@@ -484,7 +486,9 @@ public class Project3 extends Project {
 	public void recoverState(String str) {
 		//create the thread to look for the data_id attribute in the session so we can
 		//do further processing
-		Thread t = new Thread(new CheckSession(httpRequest.getSession()));
+		Runnable checkSessionRunnable = new CheckSession(httpRequest.getSession()); 
+		
+		Thread t = new Thread(checkSessionRunnable);
 		t.start();
 	}
 	
@@ -492,10 +496,8 @@ public class Project3 extends Project {
 	 * This class is part of Project 3, Milestone3, Task 4
 	 * NO CHANGES NEED TO BE PERFORMED ON THIS CLASS
 	 */
-	public static class CheckSession extends Thread {
-		private Thread worker;
+	public static class CheckSession implements Runnable {
 		private HttpSession session=null;
-		private Object dataId=null;
 		boolean found=false;
 		int waitTime=5000;
 		
@@ -504,13 +506,9 @@ public class Project3 extends Project {
 		}
 		
 		@Override
-		public synchronized void start() {
-			worker = new Thread(this);
-			worker.start();
-		}
-		
-		@Override
 		public void run() {
+			Object dataId=null;
+			
 			try {
 				//loop until we see the data_id attribute in the session
 				while(! found) {

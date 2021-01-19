@@ -184,18 +184,6 @@ public class Project1 extends Project {
 		if (str.toLowerCase().contains("script")) {
 		    throw new AppException("internationalization() found script tag");
 		}
-	
-		//get the operating system
-		String os = System.getProperty("os.name").toLowerCase();
-		String fileName="/dev/null";
-		
-		//select the correct file based on the operating system
-		if(os.contains("windows")) {
-			fileName = "NUL";
-		}
-		else if(os.contains("linux") || os.contains("mac")) {
-			fileName = "/dev/null";
-		}
 		
 		//create temp file
 		Path tempFile=null;
@@ -280,7 +268,7 @@ public class Project1 extends Project {
 	 * @param str
 	 * @return String
 	 */
-	public String variableWidthEncoding(String str) throws AppException {
+	public String readFile(String str) throws AppException {
 		Path path=null;
 		try {
 			path = Paths.get(str);
@@ -305,12 +293,13 @@ public class Project1 extends Project {
 			    	throw new IOException("Too much input");
 			    }
 			  }
+			
+			return readSb.toString();
 		}
 		catch(IOException ioe) {
 			throw new AppException("Caught exception reading file: " + ioe.getMessage());
 		}
 		
-		return readSb.toString();
 	}
 	
 	
@@ -329,7 +318,7 @@ public class Project1 extends Project {
 	 * @param base64Str
 	 * @return BigInteger
 	 */
-	public BigInteger encodeNonCharacter(String base64Str) {
+	public BigInteger decodeBase64(String base64Str) {
 		//decode base64 to String representation of BigInt
 		byte[] decodedBytes = Base64.getDecoder().decode(base64Str);
 		
@@ -364,7 +353,7 @@ public class Project1 extends Project {
 	 * @param str
 	 * @return String
 	 */
-	public String doubleEncoding(String str) {
+	public String cleanBadHTMLTags(String str) {
 		Pattern pattern = Pattern.compile("[<&>]");
 		Matcher matcher = pattern.matcher(str);
 		
@@ -393,7 +382,7 @@ public class Project1 extends Project {
 	 * @param fileName
 	 * @return String
 	 */
-	public String fileEncoding(String fileName) throws AppException {
+	public String getFileContents(String fileName) throws AppException {
 		try (FileInputStream fis = new FileInputStream(fileName)) {
 			try ( DataInputStream dis = new DataInputStream(fis) ) {
 				byte[] data = new byte[1024];
