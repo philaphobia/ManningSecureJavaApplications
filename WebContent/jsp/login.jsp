@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+    pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -7,15 +7,14 @@
 <title>Login Form</title>
 </head>
 <body>
-	<form action="<%=request.getServletContext().getContextPath() %>/app"
-		method="post">
+<form action="<%=request.getServletContext().getContextPath() %>/app" method="post">
 		<table style="with: 50%">
-
+ 
 			<tr>
 				<td>UserName</td>
 				<td><input type="text" name="username" /></td>
 			</tr>
-			<tr>
+				<tr>
 				<td>Password</td>
 				<td><input type="password" name="password" /></td>
 			</tr>
@@ -24,9 +23,8 @@
 				<td><input type="text" name="email" /></td>
 			</tr>
 		</table>
-		<input type="hidden" name="action" value="xml_login" /> <input
-			type="hidden" name="secure_form" value="true" /> <input type="submit"
-			value="Login" />
-	</form>
+		<input type="hidden" name="action" value="xml_login"/>
+		<input type="hidden" name="secure_form" value="true"/>
+		<input type="submit" value="Login" /></form>
 </body>
 </html>
