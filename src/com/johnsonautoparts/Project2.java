@@ -692,11 +692,8 @@ public class Project2 extends Project {
 	 * can lead to code execution, denial of service, and other attacks
 	 * leveraging third-party libraries just like Java deserialization attacks.
 	 * 
-	 * REF:
-	 * https://www.nccgroup.com/globalassets/our-research/us/whitepapers/2018/jackson_deserialization.pdf
-	 * 
-	 * @param str
-	 * @return Object
+	 * @param data String of the json to deserialize
+	 * @return Object to deserialize
 	 */
 	public Object deserializeJson(String data) throws AppException {
 		ObjectMapper mapper = new ObjectMapper();
@@ -708,7 +705,7 @@ public class Project2 extends Project {
 
 		// deserialize the object and return
 		try {
-			return mapper.readValue(data, Object.class);
+			return (User) mapper.readValue(data, Object.class);
 		} catch (IOException ioe) {
 			throw new AppException("deserializationJson caught IOException: "
 					+ ioe.getMessage());
