@@ -116,7 +116,7 @@ public class Project4 extends Project {
 		boolean loginSuccess = project2.xpathLogin(userPass);
 
 		if (loginSuccess) {
-			return (secureForm);
+			return secureForm;
 		} else {
 			return (secureForm + " unsuccessful");
 		}
@@ -130,7 +130,7 @@ public class Project4 extends Project {
 	 * RISK: Untrusted data must not be included in the web browser since it may
 	 * contain unsafe code. In a more complex attack, a malicious user may
 	 * include JavaScript and HTML. types of attacks. Untrusted data displayed
-	 * to the user should neutralize JavaScript and HTML. Use the OWASP Enocder
+	 * to the user should neutralize JavaScript and HTML. Use the OWASP Encoder
 	 * protect to filter both.
 	 * 
 	 * REF: CMU Software Engineering Institute IDS14-J
@@ -205,7 +205,7 @@ public class Project4 extends Project {
 			} // end while to process FileItems
 
 			// all files uploaded successfully
-			return (true);
+			return true;
 		} catch (InvalidPathException ipe) {
 			throw new AppException("fileUpload passed an invalid path");
 		} catch (FileUploadException fue) {
@@ -260,7 +260,7 @@ public class Project4 extends Project {
 			ise.printStackTrace(pw);
 
 			// return the error as the content
-			return (sw.toString());
+			return sw.toString();
 		}
 
 	}
@@ -309,7 +309,7 @@ public class Project4 extends Project {
 
 				// verify the insert worked based on the number of rows returned
 				if (rows > 0) {
-					return ("Blog entry accepted");
+					return "Blog entry accepted";
 				} else {
 					throw new AppException(
 							"postBlog() did not insert to table correctly");
@@ -387,7 +387,7 @@ public class Project4 extends Project {
 	public String addHeader(String header) {
 		httpResponse.addHeader("X-Header", header);
 
-		return (header);
+		return header;
 	}
 
 	/**
@@ -458,7 +458,7 @@ public class Project4 extends Project {
 
 				// verify the insert worked based on the number of rows returned
 				if (rows > 0) {
-					return ("Comments accepted");
+					return "Comments accepted";
 				} else {
 					throw new AppException(
 							"postComments() did not insert to table correctly");
@@ -576,12 +576,12 @@ public class Project4 extends Project {
 						// add the cookie to the response
 						httpResponse.addCookie(loginCookie);
 
-						return (true);
+						return true;
 					}
 					// false if no results return which means no session in the
 					// db
 					else {
-						return (false);
+						return false;
 					}
 				} // end resultset
 			} // end statement
@@ -676,7 +676,7 @@ public class Project4 extends Project {
 				sbResponse.append("CN: " + attr.toString());
 			}
 
-			return (sbResponse.toString());
+			return sbResponse.toString();
 		} catch (NamingException ne) {
 			throw new AppException(
 					"ldaLogin caught Naming Exception: " + ne.getMessage());
@@ -749,7 +749,7 @@ public class Project4 extends Project {
 					// false if no results return which means no session in the
 					// db
 					else {
-						return (false);
+						return false;
 					}
 				} // end resultset
 			} // end statement
@@ -877,7 +877,7 @@ public class Project4 extends Project {
 			resolver.addVariable(null, "password", passHash);
 
 			// return the boolean of the evaluation
-			return (expression.evaluate(doc, XPathConstants.NODE) == null);
+			return ( expression.evaluate(doc, XPathConstants.NODE) == null );
 		} catch (ParserConfigurationException | SAXException
 				| XPathException xmle) {
 			throw new AppException(

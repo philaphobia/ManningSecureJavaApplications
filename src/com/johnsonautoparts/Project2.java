@@ -685,7 +685,7 @@ public class Project2 extends Project {
 	 * Project 2, Milestone 2, Task 6
 	 * 
 	 * 
-	 * TITLE: Deserialized JSON
+	 * TITLE: Deserialize JSON
 	 * 
 	 * RISK: Java should not deserialize untrusted JSON without implementing
 	 * some controls on the object data. Allowing deserialization of JSON data
