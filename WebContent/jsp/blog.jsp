@@ -7,8 +7,8 @@
 	 * 
 	 * TITLE: Sanitize HTML when tags are needed
 	 * 
-	 * RISK: If the application allows untrusted data to include HTML, then a whitelist of accepted tags
-	 *       should be enforced. Blacklisting will not help and the tags allowed should be very limited
+	 * RISK: If the application allows untrusted data to include HTML, then an accept list of allowed tags
+	 *       should be enforced. Denying will not help and the tags allowed should be very limited
 	 *       to avoid tricky malicious users from bypassing the expected controls.
 	 * 
 	 * REF: OWASP XSS Cheat Sheet Rule #6

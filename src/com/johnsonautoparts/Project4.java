@@ -270,8 +270,9 @@ public class Project4 extends Project {
 	 * 
 	 * TITLE: Sanitize HTML when tags are needed
 	 * 
-	 * RISK: If the application allows untrusted data to include HTML, then a
-	 * whitelist of accepted tags should be enforced. Blacklisting will not help
+	 * RISK: If the application allows untrusted data to include HTML, then an 
+	 * allow (formerly known as whitelisting) of accepted tags should be enforced. 
+	 * Denying (formerly known as blacklisting) will not help
 	 * and the tags allowed should be very limited to avoid tricky malicious
 	 * users from bypassing the expected controls.
 	 * 
@@ -376,7 +377,7 @@ public class Project4 extends Project {
 	 * security headers if allowed or other attacks which use end of line
 	 * characters (called a split response header) cause the browser to receive
 	 * and process two different responses. The normal sanitization and
-	 * filtering is usually insufficient, and a whitelist of acceptable values
+	 * filtering is usually insufficient, and an accept list of valid values
 	 * would be the best solution.
 	 * 
 	 * REF: SonarSource RSPEC-5167
@@ -419,7 +420,7 @@ public class Project4 extends Project {
 	 * 
 	 * NOTES: In a previous milestone you added security controls to filter the
 	 * data in the comments.jsp form so no further changes are required in the
-	 * JSP.
+	 * JSP. This task only requires changes in the postComments() method.
 	 * 
 	 * Develop a different security control than the header here (such as a CSRF
 	 * token).
@@ -442,7 +443,7 @@ public class Project4 extends Project {
 			throw new AppException("comments() cannot retrieve referer header");
 		}
 
-		// check whitelist referer comments form
+		// check accept list referer comments form
 		if (!referer.contains(REFERER_COMMENTS)) {
 			throw new AppException("comments() cannot validate referer header");
 		}

@@ -35,9 +35,15 @@ import com.johnsonautoparts.logger.AppLogger;
 public class ServletHandler extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
+	/** 
+	 * Project 4, Milestone 3, Task 6
+	 * 
+	 * Review the scope of the loginEmail variable at the ServletHandler level
+	 */
 	// keep track of previous email address for verification
 	private String loginEmail = "none@doesnotexist.com";
 
+	
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
@@ -163,6 +169,12 @@ public class ServletHandler extends HttpServlet {
 					Project4 project4 = new Project4(connection, request,
 							response);
 
+					/**
+					 * Project 4, Milestone 3, Task 6
+					 * loginEmail variable declared in ServletHandler scope above
+					 * 
+					 * review the scope of loginEmail
+					 */
 					// store the email to use later
 					loginEmail = loginParams.get("email");
 
