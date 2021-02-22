@@ -641,7 +641,7 @@ public class Project2 extends Project {
 	 * @param str
 	 * @return String
 	 */
-	public Object deserializedObject(String base64Str) throws AppException {
+	public Object deserializeObject(String base64Str) throws AppException {
 		if (base64Str == null) {
 			throw new AppException(
 					"deserializeObject received null base64 string");
