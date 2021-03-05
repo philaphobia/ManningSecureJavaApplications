@@ -4,6 +4,7 @@
 package com.johnsonautoparts.servlet;
 
 import java.io.IOException;
+import java.sql.Connection;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -15,6 +16,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.johnsonautoparts.Project4;
 import com.johnsonautoparts.logger.AppLogger;
 
 /**
@@ -103,6 +105,13 @@ public class SecurityFilter implements Filter {
 				return;
 			}
 
+			/**
+			 * No changes need in projects for this header
+			 */
+			//update header to distinguish since passed filter
+			Project4 project4 = new Project4(null, request, response);
+			project4.addHeader("distinguish");
+			
 			// no errors detected so forward to the next filter
 			chain.doFilter(request, response);
 		} catch (ServletException se) {
