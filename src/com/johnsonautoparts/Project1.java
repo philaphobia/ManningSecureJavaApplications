@@ -237,6 +237,9 @@ public class Project1 extends Project {
 	 * types. The best suggestion is to use existing library such as: OWASP Java
 	 * Encoder (https://github.com/OWASP/owasp-java-encoder/)
 	 * 
+	 * The OWASP Java Encoder project contains several methods to protect the data
+	 * encoding. For this task, we want to encode the data to HTML.
+	 * 
 	 * Understanding the attack is important especially when trying to perform
 	 * pattern matching for other purposes.
 	 * 
@@ -265,6 +268,8 @@ public class Project1 extends Project {
 	 * @return String
 	 */
 	public String readFile(String str) throws AppException {
+		final int MAX_READ_SIZE = 1024;
+		
 		Path path = null;
 		try {
 			path = Paths.get(str);
@@ -277,21 +282,24 @@ public class Project1 extends Project {
 
 		// read the file contents
 		try (FileInputStream fios = new FileInputStream(path.toString())) {
-			byte[] data = new byte[1024 + 1];
+			byte[] data = new byte[MAX_READ_SIZE + 1];
 			int offset = 0;
 			int bytesRead = 0;
 
 			// append the data into the string
-			while ((bytesRead = fios.read(data, offset,
-					data.length - offset)) != -1) {
-				readSb.append(new String(data, offset, bytesRead));
+			String readStr = new String();
+			
+			while ((bytesRead = fios.read(data, offset, data.length - offset)) != -1) {
+				readStr += new String(data, offset, bytesRead, "UTF-8");
+				
 				offset += bytesRead;
 				if (offset >= data.length) {
 					throw new IOException("Too much input");
 				}
 			}
 
-			return readSb.toString();
+			return readStr;
+			
 		} catch (IOException ioe) {
 			throw new AppException(
 					"Caught exception reading file: " + ioe.getMessage());
@@ -463,12 +471,12 @@ public class Project1 extends Project {
 	 * @return boolean
 	 */
 	public boolean comparisonTask(String num) throws AppException {
-		double compare = 6.1;
+		double compareTaskId = 6.1;
 
 		try {
 			double userInput = Double.parseDouble(num);
 
-			double result = Math.cos(compare / userInput); // Returns NaN if
+			double result = Math.cos(compareTaskId / userInput); // Returns NaN if
 															// input is infinity
 
 			// check if we received the expected result
