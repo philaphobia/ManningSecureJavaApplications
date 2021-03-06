@@ -20,7 +20,7 @@ Many Integrated Development Environment (IDE) tools are available for coding in 
 
 ## Help with IntelliJ
 The project can be loaded directly using GIT:
-1. From the GIT page, click 'Code', then copy the HTTPS URL
+1. From the GIT web page, click 'Code', then copy the HTTPS URL
 2. In IntelliJ, chose 'Get from VCS'
 3. Paste the GIT URL into the 'URL'
 
@@ -31,7 +31,7 @@ The project can be loaded directly using GIT:
 You will need the Java EE version of Eclipse to open the project. On the Eclipse download page, it is called 'Eclipse IDE for Enterprise Java Developers'
 
 The project can be loaded directly using GIT:
-1. From the GIT page, click 'Code', then copy the HTTPS URL
+1. From the GIT web page, click 'Code', then copy the HTTPS URL
 2. In Eclipse, chose File, then Import
 3. Expand the Git option, and select 'Projects from Git'
 4. Select 'Clone URI'
