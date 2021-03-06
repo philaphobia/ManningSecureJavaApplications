@@ -2,7 +2,7 @@ package com.johnsonautoparts.logger;
 
 import java.util.logging.Logger;
 
-/**
+/*
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
  * 
  * Some milestones may suggest extra work for bonus credit by updating this

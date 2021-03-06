@@ -35,8 +35,7 @@ import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
 import com.johnsonautoparts.servlet.SessionConstant;
 
-/**
- * 
+/*
  * Project3 class which contains all the method for the milestones. The task
  * number represents the steps within a milestone.
  * 
@@ -56,7 +55,7 @@ public class Project3 extends Project {
 		super(connection, httpRequest, httpResponse);
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 1, Task 1
 	 * 
 	 * TITLE: Suppressing exceptions
@@ -68,8 +67,8 @@ public class Project3 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute ERR00-J
 	 * 
-	 * @param query
-	 * @return String
+	 * @param str
+	 * @return boolean
 	 */
 	public boolean suppressException(String str) throws AppException {
 		// try to authenticate the user
@@ -86,7 +85,7 @@ public class Project3 extends Project {
 		return true;
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 1, Task 2
 	 * 
 	 * TITLE: Sensitive data exposure from exceptions
@@ -120,7 +119,7 @@ public class Project3 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 1, Task 3
 	 * 
 	 * TITLE: Exceptions during logging
@@ -162,7 +161,7 @@ public class Project3 extends Project {
 		return null;
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 2, Task 1
 	 * 
 	 * TITLE: Restore object state on failure
@@ -172,7 +171,7 @@ public class Project3 extends Project {
 	 * leverage the logic error to bypass controls or perform a denial of
 	 * service.
 	 * 
-	 * ADDITONAL: The method retrieves the contents of a PDF file in the
+	 * ADDITIONAL: The method retrieves the contents of a PDF file in the
 	 * database accessed by the ID passed to the method. The method keeps track
 	 * of the number of documents accessed during the existing session. This is
 	 * done by retrieving the value of the session attribute "docs_accessed".
@@ -246,7 +245,7 @@ public class Project3 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 2, Task 2
 	 * 
 	 * TITLE: Exception handling flow
@@ -258,8 +257,8 @@ public class Project3 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute ERR004-J, ERR05-J
 	 * 
-	 * @param query
-	 * @return String
+	 * @param fileContents
+	 * @return boolean
 	 */
 	@SuppressWarnings({"finally", "resource"})
 	public boolean flowHandling(String fileContents) throws Exception {
@@ -279,7 +278,7 @@ public class Project3 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 2, Task 3
 	 * 
 	 * TITLE: Throwing or catching RuntimeException
@@ -291,7 +290,7 @@ public class Project3 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute ERR07-J
 	 * 
-	 * @param query
+	 * @param cmd
 	 * @return String
 	 */
 	public String runtimeException(String cmd) throws Exception {
@@ -328,11 +327,11 @@ public class Project3 extends Project {
 			throw new Exception("exec caught IO error: " + ioe.getMessage());
 		} catch (InterruptedException ie) {
 			throw new Exception(
-					"exec caught interupted error: " + ie.getMessage());
+					"exec caught interrupted error: " + ie.getMessage());
 		}
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 1, Task 4
 	 * 
 	 * TITLE: Handling NullPointerException
@@ -344,8 +343,8 @@ public class Project3 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute ERR08-J
 	 * 
-	 * @param query
-	 * @return String
+	 * @param str
+	 * @return boolean
 	 */
 	public boolean testNull(String str) throws NullPointerException {
 		try {
@@ -357,7 +356,7 @@ public class Project3 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 3, Task 1
 	 * 
 	 * TITLE: Ignoring return values
@@ -369,7 +368,7 @@ public class Project3 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute EXP00-J
 	 * 
-	 * @param query
+	 * @param fileName
 	 * @return String
 	 */
 	public String deleteFile(String fileName) throws AppException {
@@ -391,7 +390,7 @@ public class Project3 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 3, Task 2
 	 * 
 	 * TITLE: Avoiding null objects
@@ -403,7 +402,7 @@ public class Project3 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute EXP01-J and EXP54-J
 	 * 
-	 * @param query
+	 * @param str
 	 * @return String
 	 */
 	public String manipulateString(String str) throws AppException {
@@ -418,7 +417,7 @@ public class Project3 extends Project {
 		return manipulated;
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 3, Task 3
 	 * 
 	 * TITLE: Detect file-related errors
@@ -431,7 +430,7 @@ public class Project3 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute FIO02-J
 	 * 
-	 * @param query
+	 * @param fileName
 	 * @return String
 	 */
 	public String detectFileError(String fileName) throws AppException {
@@ -458,7 +457,7 @@ public class Project3 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 3, Task 4
 	 * 
 	 * TITLE: Recover from an unstable state
@@ -478,8 +477,7 @@ public class Project3 extends Project {
 	 * pro/con of catching Throwable:
 	 * https://www.baeldung.com/java-catch-throwable-bad-practice
 	 * 
-	 * @param query
-	 * @return String
+	 * @param str
 	 */
 	public void recoverState(String str) {
 		// create the thread to look for the data_id attribute in the session so
@@ -492,7 +490,7 @@ public class Project3 extends Project {
 		t.start();
 	}
 
-	/**
+	/*
 	 * This class is part of Project 3, Milestone3, Task 4 NO CHANGES NEED TO BE
 	 * PERFORMED ON THIS CLASS
 	 */
@@ -524,14 +522,14 @@ public class Project3 extends Project {
 				AppLogger.log("thread was interrupted: " + ie.getMessage());
 				Thread.currentThread().interrupt();
 			} catch (IllegalArgumentException iae) {
-				AppLogger.log("thread caught illegal argumen to sleep: "
+				AppLogger.log("thread caught illegal argument to sleep: "
 						+ iae.getMessage());
 			}
 
 		}
 	}
 
-	/**
+	/*
 	 * Project 3, Milestone 3, Task 5
 	 * 
 	 * TITLE: Handle open resources in cascading try-catch-finally
@@ -545,8 +543,8 @@ public class Project3 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute ERR54-J
 	 * 
-	 * @param query
-	 * @return String
+	 * @param zipFile
+	 * @return boolean
 	 */
 	public boolean handleClose(String zipFile)
 			throws AppException, IOException {
@@ -576,7 +574,7 @@ public class Project3 extends Project {
 			zis = new ZipInputStream(new BufferedInputStream(fis));
 			ZipEntry entry;
 
-			/**
+			/*
 			 * write the zip files
 			 *
 			 * the code is simplified to reduce the size and does not take into

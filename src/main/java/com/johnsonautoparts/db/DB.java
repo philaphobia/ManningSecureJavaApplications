@@ -19,14 +19,14 @@ import com.johnsonautoparts.exception.DBException;
 import com.johnsonautoparts.logger.AppLogger;
 
 public class DB {
-	/**
+	/*
 	 * Method to instantiate a connection to the database and store the
 	 * connection object with the session.
 	 * 
 	 * This class is not part of the course that needs to be reviewed or
 	 * updated. It is only here to facilitate DB queries.
 	 * 
-	 * @param HttpSession
+	 * @param session
 	 * @return Connection
 	 * @throws DBException
 	 **/
@@ -79,10 +79,10 @@ public class DB {
 
 	}
 
-	/**
+	/*
 	 * Method to close the database connection in the session
 	 * 
-	 * @param HttpSession
+	 * @param session
 	 * @throws DBException
 	 */
 	public static void closeDbConnection(HttpSession session)

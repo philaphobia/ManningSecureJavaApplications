@@ -40,7 +40,7 @@
 		<tr><td>Please verify your blog post before submission (HTML tags P,TABLE,DIV,TR,TD allowed):</td></tr>
 			<%
 			/**
-			 * The JSP rectries the parameter blog and places the data into the text area for review by
+			 * The JSP retries the parameter blog and places the data into the text area for review by
 			 * the user so they can make edits before submitting the data.
 			 */
 			%>

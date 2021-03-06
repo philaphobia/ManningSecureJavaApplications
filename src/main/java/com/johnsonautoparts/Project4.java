@@ -67,7 +67,7 @@ import org.xml.sax.SAXException;
 import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
 
-/**
+/*
  * 
  * Project4 class which contains all the method for the milestones. The task
  * number represents the steps within a milestone.
@@ -88,7 +88,7 @@ public class Project4 extends Project {
 		super(connection, httpRequest, httpResponse);
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 1, Task 1
 	 * 
 	 * TITLE: Do not trust hidden forms
@@ -122,7 +122,7 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 1, Task 2
 	 * 
 	 * TITLE: Encoding data and escaping output for display
@@ -143,7 +143,7 @@ public class Project4 extends Project {
 	 */
 	// END Project 4, Milestone 1, Task 2
 
-	/**
+	/*
 	 * Project 4, Milestone 1, Task 3
 	 * 
 	 * TITLE: Avoid arbitrary file uploads
@@ -159,7 +159,7 @@ public class Project4 extends Project {
 	 * REF: CMU Software Engineering Institute IDS56-J CODE:
 	 * https://www.tutorialspoint.com/servlets/servlets-file-uploading.htm
 	 * 
-	 * @param int
+	 * @param numFiles
 	 * @return boolean
 	 */
 	public boolean fileUpload(int numFiles) throws AppException {
@@ -223,7 +223,7 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 1, Task 4
 	 * 
 	 * TITLE: Do not use printStackTrace
@@ -265,7 +265,7 @@ public class Project4 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 1, Task 5
 	 * 
 	 * TITLE: Sanitize HTML when tags are needed
@@ -332,7 +332,7 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 1, Task 6
 	 * 
 	 * TITLE: Do not add main() method to a webapp
@@ -347,7 +347,7 @@ public class Project4 extends Project {
 	 */
 	// END Project 4, Milestone 1, Task 6
 
-	/**
+	/*
 	 * Project 4, Milestone 2, Task 1
 	 * 
 	 * TITLE: HTTP verb (method) security
@@ -366,7 +366,7 @@ public class Project4 extends Project {
 	 */
 	// END Project 4, Milestone 2, Task 1
 
-	/**
+	/*
 	 * Project 4, Milestone 2, Task 2
 	 * 
 	 * TITLE: Avoid header injection
@@ -391,7 +391,7 @@ public class Project4 extends Project {
 		return header;
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 2, Task 3
 	 * 
 	 * TITLE: Servlet must not throw errors
@@ -409,7 +409,7 @@ public class Project4 extends Project {
 	 */
 	// END Project 4, Milestone 2, Task 3
 
-	/**
+	/*
 	 * Project 4, Milestone 2, Task 4
 	 * 
 	 * TITLE: Do not trust referer header for security decisions
@@ -481,7 +481,7 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 2, Task 5
 	 * 
 	 * TITLE: Do not redirect to URL from untrusted source
@@ -504,7 +504,7 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 2, Task 6
 	 * 
 	 * TITLE: Protect the webapp with security headers
@@ -527,7 +527,7 @@ public class Project4 extends Project {
 	 */
 	// END Project 4, Milestone 2, Task 6
 
-	/**
+	/*
 	 * Project 4, Milestone 3, Task 1
 	 * 
 	 * TITLE: Do not store authentication information on client
@@ -537,8 +537,8 @@ public class Project4 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute FIO52-J
 	 * 
-	 * @param str
-	 * @return String
+	 * @param username
+	 * @return boolean
 	 */
 	public boolean rememberMe(String username) throws AppException {
 		HttpSession session = httpRequest.getSession();
@@ -603,7 +603,7 @@ public class Project4 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 3, Task 2
 	 * 
 	 * TITLE: LDAP authentication for bind
@@ -632,7 +632,7 @@ public class Project4 extends Project {
 		return new InitialDirContext(env);
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 3, Task 3
 	 * 
 	 * TITLE: Prevent LDAP injection
@@ -645,11 +645,11 @@ public class Project4 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute IDS-54J
 	 * 
-	 * @param str
+	 * @param userSN
+	 * @param userPassword
 	 * @return String
 	 */
-	public String ldapLogin(String userSN, String userPassword)
-			throws AppException {
+	public String ldapLogin(String userSN, String userPassword) throws AppException {
 		DirContext context = null;
 
 		try {
@@ -694,7 +694,7 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 3, Task 4
 	 * 
 	 * TITLE: Do not use getRequestedSessionId
@@ -712,8 +712,8 @@ public class Project4 extends Project {
 	 * 
 	 * REF: SonarSource RSPEC-2254
 	 * 
-	 * @param str
-	 * @return String
+	 * @param role
+	 * @return boolean
 	 */
 	public boolean isRoleValid(String role) throws AppException {
 		// check for null parameter first
@@ -770,7 +770,7 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 3, Task 5
 	 * 
 	 * TITLE: Add flags to protect cookies
@@ -780,7 +780,7 @@ public class Project4 extends Project {
 	 * 
 	 * REF: SonarSource RSPEC-2254
 	 * 
-	 * @param str
+	 * @param pref
 	 * @return String
 	 */
 	public String setPrefCookie(String pref) throws AppException {
@@ -812,7 +812,7 @@ public class Project4 extends Project {
 		return ("set pref " + safePref);
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 3, Task 6
 	 * 
 	 * TITLE: Avoid leaking session data across servlet sessions
@@ -833,8 +833,7 @@ public class Project4 extends Project {
 	 * @param password
 	 * @return boolean
 	 */
-	public boolean loginEmail(String email, String password)
-			throws AppException {
+	public boolean loginEmail(String email, String password) throws AppException {
 		Path userDbPath = null;
 		try {
 			userDbPath = Paths.get(System.getProperty("catalina.base"),
@@ -854,8 +853,7 @@ public class Project4 extends Project {
 			String passHash = encryptPassword(password);
 
 			// load the users xml file
-			DocumentBuilderFactory domFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 			domFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
 			domFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 			domFactory.setNamespaceAware(true);
@@ -878,7 +876,7 @@ public class Project4 extends Project {
 			resolver.addVariable(null, "password", passHash);
 
 			// return the boolean of the evaluation
-			return ( expression.evaluate(doc, XPathConstants.NODE) == null );
+			return ( expression.evaluate(doc, XPathConstants.NODE) != null );
 		} catch (ParserConfigurationException | SAXException
 				| XPathException xmle) {
 			throw new AppException(
@@ -890,7 +888,7 @@ public class Project4 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 3, Task 7
 	 * 
 	 * TITLE: Securing Java Web Tokens (JWT)
@@ -967,7 +965,7 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 4, Task 1
 	 * 
 	 * TITLE: Manage 3rd party libraries with Software Composition Analysis
@@ -982,11 +980,11 @@ public class Project4 extends Project {
 	 */
 	// END Project 4, Milestone 4, Task 1
 
-	/**
+	/*
 	 * IMPORTANT: NO CODE NEEDS TO BE REVIEWED BELOW THIS POINT
 	 */
 
-	/**
+	/*
 	 * The following method does not need to be assessed in the project and is
 	 * only here as a helper function
 	 * 
@@ -1010,13 +1008,13 @@ public class Project4 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * The following method does not need to be assessed in the project and is
 	 * only here as a helper function
 	 * 
 	 * Code copied from: https://rgagnon.com/javadetails/java-0596.html
 	 * 
-	 * @param b
+	 * @param password
 	 * @return String
 	 */
 	private static String encryptPassword(String password) throws AppException {

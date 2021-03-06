@@ -26,7 +26,7 @@ import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.exception.DBException;
 import com.johnsonautoparts.logger.AppLogger;
 
-/**
+/*
  * Servlet Class registered via the web.xml as the primary class for handling
  * calls for the webapp. The doGet() and doPost() are called in app server and
  * registered as the handlers in this class.
@@ -35,7 +35,7 @@ import com.johnsonautoparts.logger.AppLogger;
 public class ServletHandler extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	/** 
+	/**
 	 * Project 4, Milestone 3, Task 6
 	 * 
 	 * Review the scope of the loginEmail variable at the ServletHandler level
@@ -44,14 +44,14 @@ public class ServletHandler extends HttpServlet {
 	private String loginEmail = "none@doesnotexist.com";
 
 	
-	/**
+	/*
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public ServletHandler() {
 		super();
 	}
 
-	/**
+	/*
 	 * Project 4, Milestone 1, Task 6
 	 * 
 	 * TITLE: Do not add main() method to a webapp
@@ -64,7 +64,7 @@ public class ServletHandler extends HttpServlet {
 	 * REF: SonarSource RSPEC-2653
 	 * 
 	 */
-	/**
+	/*
 	 * Out of band used test functions of WAR
 	 */
 	public static void main(String[] args) {
@@ -95,7 +95,7 @@ public class ServletHandler extends HttpServlet {
 		}
 	}
 
-	/**
+	/*
 	 * Handle POST request
 	 */
 	@Override
@@ -166,10 +166,9 @@ public class ServletHandler extends HttpServlet {
 
 					// create the project4 instance
 					Connection connection = getConnection(request);
-					Project4 project4 = new Project4(connection, request,
-							response);
+					Project4 project4 = new Project4(connection, request, response);
 
-					/**
+					/*
 					 * Project 4, Milestone 3, Task 6
 					 * loginEmail variable declared in ServletHandler scope above
 					 * 
@@ -297,7 +296,7 @@ public class ServletHandler extends HttpServlet {
 
 			// all other actions
 			default :
-				/**
+				/*
 				 * Project 4, Milestone 2, Task 1
 				 * 
 				 * TITLE: HTTP verb (method) security
@@ -323,7 +322,7 @@ public class ServletHandler extends HttpServlet {
 		return;
 	}
 
-	/**
+	/*
 	 * Handle GET request
 	 */
 	@Override
@@ -424,7 +423,7 @@ public class ServletHandler extends HttpServlet {
 			return;
 		}
 
-		/**
+		/*
 		 * Project 4, Milestone 2, Task 3
 		 * 
 		 * TITLE: Servlet must not throw errors
@@ -445,17 +444,17 @@ public class ServletHandler extends HttpServlet {
 
 	}
 
-	/**
+	/*
 	 * 
 	 * NOTHING BELOW THIS POINT NEEDS TO BE EDITED FOR THE liveProject
 	 *
 	 */
 
-	/**
+	/*
 	 * Verify the required parameters where passed
 	 * 
 	 * @param request
-	 * @param response
+	 * @return Map<String,String>
 	 */
 	private Map<String, String> parseParams(HttpServletRequest request)
 			throws AppException {
@@ -467,7 +466,7 @@ public class ServletHandler extends HttpServlet {
 			throw new AppException("no params sent");
 		}
 
-		/**
+		/*
 		 * 
 		 * check if the project param was sent
 		 * 
@@ -510,11 +509,11 @@ public class ServletHandler extends HttpServlet {
 		return (params);
 	}// end parseParams
 
-	/**
+	/*
 	 * Verify the required parameters where passed
 	 * 
 	 * @param request
-	 * @param response
+	 * @return Map<String,String>
 	 */
 	private Map<String, String> parseLoginParams(HttpServletRequest request)
 			throws AppException {
@@ -582,15 +581,15 @@ public class ServletHandler extends HttpServlet {
 
 	}// end parseLoginParams
 
-	/**
+	/*
 	 * Internal method to discover the proper method to call by using reflection
 	 * 
 	 * IMPORTANT: THIS CODE IS NOT PART OF THE EXERCISES TO REVIEW The method is
 	 * only here to simplify the code base and dynamically call the tasks since
 	 * there are so many in the projects.
 	 * 
-	 * @param requestClass
-	 *            The Project class requested
+	 * @param requestClass The Project class requested
+	 * @param params
 	 * @return Method discovered based on the string of the task name and a
 	 *         valid method which doesn't cause an Exception
 	 * @throws AppException
@@ -624,15 +623,17 @@ public class ServletHandler extends HttpServlet {
 				"application error");
 	}
 
-	/**
+	/*
 	 * Internal method to discover the proper Project to use via reflection
 	 * 
 	 * IMPORTANT: THIS CODE IS NOT PART OF THE EXERCISES TO REVIEW The method is
 	 * only here to simplify the code base and dynamically call the tasks since
 	 * there are so many in the projects.
 	 * 
-	 * @param String
-	 *            of the Project name to discover
+	 * @param projectName of the Project name to discover
+	 * @param connection of database connection
+	 * @param request
+	 * @param response
 	 * @return Project class discovered based on the string of the name
 	 * @throws AppException
 	 */
@@ -676,15 +677,15 @@ public class ServletHandler extends HttpServlet {
 		} catch (InvocationTargetException | IllegalAccessException
 				| InstantiationException instanceEx) {
 			throw new AppException(
-					"getProjetObject caught exception for invalid constuctor: "
+					"getProjectObject caught exception for invalid constructor: "
 							+ instanceEx.getMessage(),
 					"application error");
 		}
 
 	}
 
-	/**
-	 * Internal method to resolve the DB conneciton
+	/*
+	 * Internal method to resolve the DB connection
 	 * 
 	 * IMPORTANT: THIS CODE IS NOT PART OF THE EXERCISES TO REVIEW
 	 * 

@@ -6,7 +6,7 @@ import javax.servlet.ServletRequestListener;
 
 import com.johnsonautoparts.logger.AppLogger;
 
-/**
+/*
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
  * 
  * Request Listener for the initialization and destroying requests. This class

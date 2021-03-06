@@ -1,6 +1,6 @@
 package com.johnsonautoparts.servlet;
 
-/**
+/*
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
  * 
  * Session Listener for for the start and ending of a user session.

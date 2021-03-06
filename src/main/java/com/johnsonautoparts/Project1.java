@@ -19,7 +19,7 @@ import javax.servlet.http.HttpSession;
 import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
 
-/**
+/*
  * 
  * Project1 class which contains all the method for the milestones. The task
  * number represents the steps within a milestone.
@@ -40,7 +40,7 @@ public class Project1 extends Project {
 		super(connection, httpRequest, httpResponse);
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 1, Task 1
 	 * 
 	 * TITLE: Normalize strings before validation
@@ -68,7 +68,7 @@ public class Project1 extends Project {
 		return cleanStr;
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 1, Task 2
 	 * 
 	 * TITLE: Avoid leaking data with Format string
@@ -88,7 +88,7 @@ public class Project1 extends Project {
 		return String.format(str + " passed on date %tF", cal);
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 1, Task 3
 	 * 
 	 * TITLE: String modification before validation
@@ -120,7 +120,7 @@ public class Project1 extends Project {
 		return s.replaceAll("[\\p{Cn}]", "");
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 1, Task 4
 	 * 
 	 * TITLE: Sanitize data used in regular expressions
@@ -160,7 +160,7 @@ public class Project1 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 1, Task 5
 	 * 
 	 * TITLE: International string attacks
@@ -186,7 +186,7 @@ public class Project1 extends Project {
 		try {
 			tempFile = Files.createTempFile("", ".tmp");
 		} catch (IOException ioe) {
-			throw new AppException("IOException in internationaliation(): "
+			throw new AppException("IOException in internationalization(): "
 					+ ioe.getMessage());
 		}
 
@@ -196,12 +196,12 @@ public class Project1 extends Project {
 			writer.printf("Passed text: %s", str);
 			return true;
 		} catch (IOException ioe) {
-			throw new AppException("IOException in internationaliation(): "
+			throw new AppException("IOException in internationalization(): "
 					+ ioe.getMessage());
 		}
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 1, Task 6
 	 * 
 	 * TITLE: Logging unsanitized input
@@ -221,7 +221,7 @@ public class Project1 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 1, Task 7
 	 * 
 	 * TITLE: Avoid regex bypasses
@@ -253,7 +253,7 @@ public class Project1 extends Project {
 		return cleanText;
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 2, Task 1
 	 * 
 	 * TITLE: Avoid variable width encoding
@@ -307,7 +307,7 @@ public class Project1 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 2, Task 2
 	 * 
 	 * TITLE: Check before encoding non-character data as a string
@@ -336,7 +336,7 @@ public class Project1 extends Project {
 		return new BigInteger(byteArray);
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 2, Task 3
 	 * 
 	 * TITLE: Double encoding attacks
@@ -374,7 +374,7 @@ public class Project1 extends Project {
 		return cleanStr;
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 2, Task 4
 	 * 
 	 * TITLE: Handling encoding on file streams
@@ -403,7 +403,7 @@ public class Project1 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 3, Task 1
 	 * 
 	 * TITLE: Preventing Integer overflow
@@ -433,7 +433,7 @@ public class Project1 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 3, Task 2
 	 * 
 	 * TITLE: Divide by zero errors
@@ -454,7 +454,7 @@ public class Project1 extends Project {
 		return monthly / monthlyTasks;
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 3, Task 3
 	 * 
 	 * TITLE: Avoid calculations on NaN and infinity
@@ -480,11 +480,8 @@ public class Project1 extends Project {
 															// input is infinity
 
 			// check if we received the expected result
-			if (result == Double.NaN) {
-				return false;
-			} else {
-				return true;
-			}
+			return (result == Double.NaN);
+
 		} catch (NumberFormatException nfe) {
 			throw new AppException(
 					"comparisonTask caught number exception from user input: "
@@ -492,7 +489,7 @@ public class Project1 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 3, Task 4
 	 * 
 	 * TITLE: String representation of numbers
@@ -530,7 +527,7 @@ public class Project1 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 1, Milestone 3, Task 5
 	 * 
 	 * TITLE: Generate strong random number
@@ -540,8 +537,8 @@ public class Project1 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute MSC02-J
 	 * 
-	 * @param num
-	 * @return boolean
+	 * @param range
+	 * @return int
 	 */
 	public int randomNumGenerate(int range) {
 		// seed the random number generator

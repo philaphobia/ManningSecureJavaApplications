@@ -6,7 +6,7 @@ import javax.servlet.ServletContextListener;
 
 import com.johnsonautoparts.logger.AppLogger;
 
-/**
+/*
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
  * 
  * Context Listener for deployment and destroying of servlet. This class

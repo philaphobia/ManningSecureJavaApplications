@@ -1,6 +1,6 @@
 package com.johnsonautoparts.exception;
 
-/**
+/*
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
  * 
  * A class to distinguish database exceptions from common exceptions from common

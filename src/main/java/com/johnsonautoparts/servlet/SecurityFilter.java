@@ -1,5 +1,5 @@
-/**
- * 
+/*
+ * SecurityFilter for parsing before calling Servlet
  */
 package com.johnsonautoparts.servlet;
 
@@ -19,11 +19,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.johnsonautoparts.Project4;
 import com.johnsonautoparts.logger.AppLogger;
 
-/**
+/*
  *
  */
 public class SecurityFilter implements Filter {
-	/**
+	/*
 	 * Called by the web container to indicate to a filter that it is being
 	 * placed into service. The servlet container calls the init method exactly
 	 * once after instantiating the filter. The init method must complete
@@ -36,7 +36,7 @@ public class SecurityFilter implements Filter {
 		// initializing steps
 	}
 
-	/**
+	/*
 	 * The doFilter method of the Filter is called by the container each time a
 	 * request/response pair is passed through the chain due to a client request
 	 * for a resource at the end of the chain. The FilterChain passed in to this
@@ -59,7 +59,7 @@ public class SecurityFilter implements Filter {
 		final String SERVER_HOSTNAME = "localhost";
 
 		try {
-			/**
+			/*
 			 * Project 4, Milestone 2, Task 6
 			 * 
 			 * TITLE: Protect the webapp with security headers
@@ -95,7 +95,7 @@ public class SecurityFilter implements Filter {
 				// do something with valid POST request
 			}
 
-			/**
+			/*
 			 * unknown method Send request to /accessdenied.jsp
 			 */
 			else {
@@ -105,7 +105,7 @@ public class SecurityFilter implements Filter {
 				return;
 			}
 
-			/**
+			/*
 			 * No changes need in projects for this header
 			 */
 			//update header to distinguish since passed filter
@@ -119,7 +119,7 @@ public class SecurityFilter implements Filter {
 		}
 	}
 
-	/**
+	/*
 	 * Called by the web container to indicate to a filter that it is being
 	 * taken out of service. This method is only called once all threads within
 	 * the filter's doFilter method have exited or after a timeout period has
@@ -130,10 +130,12 @@ public class SecurityFilter implements Filter {
 		// finalize
 	}
 
-	/**
+	/*
 	 * Standardize error sent to user
 	 * 
 	 * @param request
+	 * @param response
+	 * @param err
 	 */
 	private void sendSecurityError(HttpServletRequest request,
 			HttpServletResponse response, String err) {

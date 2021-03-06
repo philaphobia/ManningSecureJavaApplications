@@ -43,7 +43,7 @@ import com.johnsonautoparts.exception.AppException;
 import com.johnsonautoparts.logger.AppLogger;
 import com.johnsonautoparts.servlet.SessionConstant;
 
-/**
+/*
  * 
  * Project2 class which contains all the method for the milestones. The task
  * number represents the steps within a milestone.
@@ -64,7 +64,7 @@ public class Project2 extends Project {
 		super(connection, httpRequest, httpResponse);
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 1, Task 1
 	 * 
 	 * TITLE: Protect the database from SQL injection
@@ -76,8 +76,8 @@ public class Project2 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute IDS00-J
 	 * 
-	 * @param query
-	 * @return String
+	 * @param id
+	 * @return int
 	 */
 	public int dbInventory(String id) throws AppException {
 		if (connection == null) {
@@ -115,7 +115,7 @@ public class Project2 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 1, Task 2
 	 * 
 	 * TITLE: Avoid SQL injection protection errors
@@ -129,7 +129,7 @@ public class Project2 extends Project {
 	 * REF: CMU Software Engineering Institute IDS00-J
 	 * 
 	 * @param taskName
-	 * @return String
+	 * @return int
 	 */
 	public int dbTasks(String taskName) throws AppException {
 		if (connection == null) {
@@ -167,7 +167,7 @@ public class Project2 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 1, Task 3
 	 * 
 	 * TITLE: Safe naming for files
@@ -179,8 +179,7 @@ public class Project2 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute IDS50-J
 	 * 
-	 * @param str
-	 * @return String
+	 * @param fileName
 	 */
 	public void createFile(String fileName) throws AppException {
 		Path tempPath = null;
@@ -208,7 +207,7 @@ public class Project2 extends Project {
 					SessionConstant.SESSION_DATA + " does not contain text");
 		}
 
-		/**
+		/*
 		 * For the current task, do not worry about fixing makeSafePath() This
 		 * is an exercise for the next task. The current task is to only focus
 		 * on creating a safe filename
@@ -230,7 +229,7 @@ public class Project2 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 1, Task 4
 	 * 
 	 * TITLE: Protecting file paths
@@ -242,14 +241,14 @@ public class Project2 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute FIO16-J
 	 * 
-	 * @param str
+	 * @param dirty
 	 * @return String
 	 */
 	public String makeSafePath(String dirty) {
 		return dirty.replaceAll("\\.\\." + File.separator, "_");
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 1, Task 5
 	 * 
 	 * TITLE: Safe extraction of compressed files
@@ -262,7 +261,7 @@ public class Project2 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute IDS04-J
 	 * 
-	 * @param str
+	 * @param fileName
 	 * @return String
 	 */
 	public String unzip(String fileName) throws AppException {
@@ -342,11 +341,11 @@ public class Project2 extends Project {
 					"unzip caught IO error: " + ioe.getMessage());
 		}
 
-		// diretory to the extracted zip
+		// directory to the extracted zip
 		return zipPath.toString();
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 1, Task 6
 	 * 
 	 * TITLE: Sanitize data used in exec()
@@ -385,23 +384,23 @@ public class Project2 extends Project {
 			throw new AppException("exec caught IO error: " + ioe.getMessage());
 		} catch (InterruptedException ie) {
 			throw new AppException(
-					"exec caught interupted error: " + ie.getMessage());
+					"exec caught interrupted error: " + ie.getMessage());
 		}
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 1, Task 7
 	 * 
 	 * TITLE: Sanitize data used in JavaScript engine
 	 * 
-	 * RISK: The ScriptEnginer in Java provides a JavaScript engine for
+	 * RISK: The ScriptEngine in Java provides a JavaScript engine for
 	 * interpreting code and executing. Passing untrusted text with sanitization
 	 * could allow and attacker to run code which executes on the operating
 	 * system in the internal network.
 	 * 
 	 * REF: CMU Software Engineering Institute IDS52-J
 	 * 
-	 * @param cmd
+	 * @param printMessage
 	 * @return String
 	 */
 	public String evalScript(String printMessage) throws AppException {
@@ -429,11 +428,11 @@ public class Project2 extends Project {
 			}
 		} catch (ScriptException se) {
 			throw new AppException(
-					"evalScript caugth ScriptException: " + se.getMessage());
+					"evalScript caugtht ScriptException: " + se.getMessage());
 		}
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 2, Task 1
 	 * 
 	 * TITLE: Prevent XML injection attacks
@@ -445,7 +444,7 @@ public class Project2 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute IDS16-J
 	 * 
-	 * @param str
+	 * @param partQuantity
 	 * @return String
 	 */
 	public String createXML(String partQuantity) throws AppException {
@@ -478,7 +477,7 @@ public class Project2 extends Project {
 		return (doc.toString());
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 2, Task 2
 	 * 
 	 * TITLE: Validate with XML schema
@@ -488,8 +487,8 @@ public class Project2 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute IDS16-J
 	 * 
-	 * @param str
-	 * @return String
+	 * @param xml
+	 * @return Document
 	 */
 	public Document validateXML(String xml) throws AppException {
 		Path xsdPath = null;
@@ -520,7 +519,7 @@ public class Project2 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 2, Task 3
 	 * 
 	 * TITLE: Project against XML External Entity (XEE) attacks
@@ -531,8 +530,8 @@ public class Project2 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute IDS17-J
 	 * 
-	 * @param str
-	 * @return String
+	 * @param xml
+	 * @return Document
 	 */
 	public Document parseXML(String xml) throws AppException {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -553,7 +552,7 @@ public class Project2 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 2, Task 4
 	 * 
 	 * TITLE: Avoid XPath injection
@@ -567,7 +566,7 @@ public class Project2 extends Project {
 	 * Source code from:
 	 * https://wiki.sei.cmu.edu/confluence/display/java/IDS53-J.+Prevent+XPath+Injection
 	 * 
-	 * @param str
+	 * @param userPass
 	 * @return boolean
 	 */
 	public boolean xpathLogin(String userPass) throws AppException {
@@ -623,7 +622,7 @@ public class Project2 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 2, Task 5
 	 * 
 	 * 
@@ -638,8 +637,8 @@ public class Project2 extends Project {
 	 * 
 	 * REF: CMU Software Engineering Institute SER12-J
 	 * 
-	 * @param str
-	 * @return String
+	 * @param base64Str
+	 * @return Object
 	 */
 	public Object deserializeObject(String base64Str) throws AppException {
 		if (base64Str == null) {
@@ -666,24 +665,23 @@ public class Project2 extends Project {
 				return ois.readObject();
 			} catch (StreamCorruptedException sce) {
 				throw new AppException(
-						"deserializedObject caugh stream exception: "
+						"deserializedObject caught stream exception: "
 								+ sce.getMessage());
 			} catch (ClassNotFoundException | InvalidClassException ce) {
 				throw new AppException(
-						"deserializedObject caugh class exception: "
+						"deserializedObject caught class exception: "
 								+ ce.getMessage());
 			}
 
 		} catch (IOException ioe) {
-			throw new AppException("deserializedObject caugh IO exception: "
+			throw new AppException("deserializedObject caught IO exception: "
 					+ ioe.getMessage());
 		}
 
 	}
 
-	/**
+	/*
 	 * Project 2, Milestone 2, Task 6
-	 * 
 	 * 
 	 * TITLE: Deserialize JSON
 	 * 
@@ -713,7 +711,7 @@ public class Project2 extends Project {
 
 	}
 
-	/**
+	/*
 	 * Class for Milestone 2, Task 6
 	 * 
 	 * NO CHANGES NEEDED IN THIS FILE
@@ -740,13 +738,13 @@ public class Project2 extends Project {
 		}
 	}
 
-	/**
+	/*
 	 * The following method does not need to be assessed in the project and is
 	 * only here as a helper function
 	 * 
 	 * Code copied from: https://rgagnon.com/javadetails/java-0596.html
 	 * 
-	 * @param b
+	 * @param password
 	 * @return String
 	 */
 	private static String encryptPassword(String password) throws AppException {

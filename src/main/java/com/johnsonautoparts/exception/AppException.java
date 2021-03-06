@@ -1,6 +1,6 @@
 package com.johnsonautoparts.exception;
 
-/**
+/*
  * NO CHANGES NEEDED ON THIS CLASS FOR THE liveProject
  * 
  * Common class for handling exceptions in the application.
