@@ -135,8 +135,6 @@ public class SecurityFilter implements Filter {
 	 * 
 	 * @param request
 	 */
-	// private void sendSecurityError(HttpServletResponse response, String err)
-	// {
 	private void sendSecurityError(HttpServletRequest request,
 			HttpServletResponse response, String err) {
 		AppLogger.log("Exception in security filter: " + err);
