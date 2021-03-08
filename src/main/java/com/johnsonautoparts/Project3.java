@@ -116,8 +116,8 @@ public class Project3 extends Project {
 		} catch (InvalidPathException ipe) {
 			return ("Error with requested file: " + ipe.getMessage());
 		}
-
 	}
+
 
 	/*
 	 * Project 3, Milestone 1, Task 3
