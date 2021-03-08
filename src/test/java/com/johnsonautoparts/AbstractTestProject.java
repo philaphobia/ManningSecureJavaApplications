@@ -1,17 +1,29 @@
 package com.johnsonautoparts;
 
 import org.junit.jupiter.api.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 
-import java.io.File;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public abstract class AbstractTestProject {
-    protected static Connection connection=null;
+    protected static Connection connectionMock;
+    protected static HttpServletResponse responseMock;
+    protected static HttpServletRequest requestMock;
 
     @BeforeAll
     static void setup() {
+        HttpSession sessionMock = Mockito.mock(HttpSession.class);
+        HttpServletResponse responseMock = Mockito.mock(HttpServletResponse.class);
+        HttpServletRequest requestMock = Mockito.mock(HttpServletRequest.class);
+        connectionMock = Mockito.mock(Connection.class);
+        Mockito.when(requestMock.getSession()).thenReturn(sessionMock);
+
+        /*
         //create the Derby DB connection
         try {
             // define the JDBC driver class
@@ -34,8 +46,10 @@ public abstract class AbstractTestProject {
         catch(Exception e) {
             System.out.println(" [-] Failed to create connect to Derby DB: " + e.getMessage());
         }
+        */
     }
 
+/*
     @AfterAll
     static void cleanAll() {
         if (connection != null) {
@@ -48,4 +62,5 @@ public abstract class AbstractTestProject {
             }
         }
     }
+ */
 }
