@@ -31,6 +31,7 @@ import javax.xml.xpath.XPathException;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import com.johnsonautoparts.servlet.ServletUtilities;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -59,8 +60,7 @@ import com.johnsonautoparts.servlet.SessionConstant;
  */
 public class Project2 extends Project {
 
-	public Project2(Connection connection, HttpServletRequest httpRequest,
-			HttpServletResponse httpResponse) {
+	public Project2(Connection connection, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
 		super(connection, httpRequest, httpResponse);
 	}
 
@@ -570,15 +570,15 @@ public class Project2 extends Project {
 	 * @return boolean
 	 */
 	public boolean xpathLogin(String userPass) throws AppException {
-		// create a path to the webapp
-		Path userDbPath = null;
+		// a path to the webapp
+		String userDbPath = null;
+
 		try {
-			userDbPath = Paths.get(System.getProperty("catalina.base"),
-					"webapps", httpRequest.getServletContext().getContextPath(),
-					"resources", "users.xml");
+			userDbPath = ServletUtilities.getUserDbPath(httpRequest);
 		} catch (InvalidPathException ipe) {
 			throw new AppException("xpathLogin passed and invalid path");
 		}
+
 
 		if (userPass == null) {
 			throw new AppException("parseXPath given a null value");
@@ -593,11 +593,11 @@ public class Project2 extends Project {
 			String passHash = encryptPassword(args[1]);
 
 			// load the users xml files
-			DocumentBuilderFactory domFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory domFactory = DocumentBuilderFactory.newInstance();
 			domFactory.setNamespaceAware(true);
 			DocumentBuilder builder = domFactory.newDocumentBuilder();
-			Document doc = builder.parse(userDbPath.toString());
+			//Document doc = builder.parse(userDbPath.toString());
+			Document doc = builder.parse(userDbPath);
 
 			// create an XPath query
 			XPathFactory factory = XPathFactory.newInstance();
@@ -757,7 +757,7 @@ public class Project2 extends Project {
 
 			byte[] b = crypt.digest();
 
-			StringBuilder sha1 = new StringBuilder();
+			StringBuilder sha1 = new StringBuilder(40);
 			for (int i = 0; i < b.length; i++) {
 				sha1.append(Integer.toString((b[i] & 0xff) + 0x100, 16)
 						.substring(1));

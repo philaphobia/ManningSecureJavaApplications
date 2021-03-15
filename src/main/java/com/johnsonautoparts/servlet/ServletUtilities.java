@@ -1,10 +1,14 @@
 package com.johnsonautoparts.servlet;
 
 import java.io.*;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.johnsonautoparts.logger.AppLogger;
@@ -62,4 +66,17 @@ public class ServletUtilities {
 		return sharedSecret;
 	}
 
+
+	/*
+	 * Provide a path to the User DB XML file
+	 * @param HttpServletRequest
+	 * @return String
+	 */
+	public static String getUserDbPath(HttpServletRequest httpRequest) throws InvalidPathException {
+		Path path = Paths.get(System.getProperty("catalina.base"),
+				"webapps", httpRequest.getContextPath(),
+				"resources", "users.xml");
+
+		return path.toString();
+	}
 }

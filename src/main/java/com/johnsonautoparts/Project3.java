@@ -185,8 +185,7 @@ public class Project3 extends Project {
 	 */
 	public String restoreState(String pdfId) throws AppException {
 		HttpSession session = httpRequest.getSession();
-		Object accessedObj = session
-				.getAttribute(SessionConstant.DOCS_ACCESSED);
+		Object accessedObj = session.getAttribute(SessionConstant.DOCS_ACCESSED);
 
 		// track number of docs accessed in session
 		int accessed = 0;
@@ -223,8 +222,7 @@ public class Project3 extends Project {
 					if (rs.next()) {
 						return rs.getString(1);
 					} else {
-						throw new AppException(
-								"restoreState did not return any results");
+						throw new AppException("restoreState did not return any results");
 					}
 				} // end resultset
 			} // end statement
