@@ -8,6 +8,7 @@ import java.security.SecureRandom;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -27,6 +28,30 @@ public class ServletUtilities {
 	 */
 	private ServletUtilities() {
 		throw new IllegalStateException("Utility class not for instantiation");
+	}
+
+	/*
+	 * Add headers for protection based on information from OWASP.
+	 *
+	 * @param response the response header
+	 */
+	public static void addSecurityHeaders(HttpServletResponse response) {
+		// click-jacking defense so content cannot be framed from a different
+		// website
+		response.addHeader("X-Frame-Options", "SAMEORIGIN");
+
+		// forces client to only use content-type sent from server and not try
+		// to
+		// determine the content type by magic sniffing
+		response.addHeader("X-Content-Type-Options", "nosniff");
+
+		// stop caching
+		response.addHeader("Cache-Control", "no-store");
+
+		// Content-Security-Policy
+		// X-Frame-Options is ignored if CSF defined but some browsers ignore so
+		// just set this
+		response.addHeader("Content-Security-Policy", "frame-ancestors 'none'");
 	}
 
 	/*
@@ -66,11 +91,10 @@ public class ServletUtilities {
 		return sharedSecret;
 	}
 
-
 	/*
 	 * Provide a path to the User DB XML file
 	 * @param HttpServletRequest
-	 * @return String
+	 * @return String of the path
 	 */
 	public static String getUserDbPath(HttpServletRequest httpRequest) throws InvalidPathException {
 		Path path = Paths.get(System.getProperty("catalina.base"),
@@ -79,4 +103,31 @@ public class ServletUtilities {
 
 		return path.toString();
 	}
+
+	/*
+	 * Provide the path to the Derby DB
+	 * @param ServletContext
+	 * @return String of the path
+	 */
+	public static String getDerbyDbPath(ServletContext context) {
+		String testDbPath = "src/main/webapp/db";
+
+		//if context is null then use source testing path
+		if(context == null) {
+			return(testDbPath);
+		}
+		else {
+			StringBuilder sb = new StringBuilder();
+
+			sb.append(System.getProperty("catalina.home") );
+			sb.append(File.separator);
+			sb.append("webapps");
+			sb.append(context.getContextPath());
+			sb.append(File.separator);
+			sb.append("db");
+
+			return sb.toString();
+		}
+	}
+
 }

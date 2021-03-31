@@ -138,8 +138,7 @@ public class Project2 extends Project {
 
 		// execute the SQL and return the count of the tasks
 		try {
-			String sql = "SELECT COUNT(task_name) FROM schedule WHERE task_name = '"
-					+ taskName + "'";
+			String sql = "SELECT COUNT(task_name) FROM schedule WHERE task_name = '" + taskName + "'";
 			try (PreparedStatement stmt = connection.prepareStatement(sql)) {
 				try (ResultSet rs = stmt.executeQuery()) {
 
@@ -153,8 +152,7 @@ public class Project2 extends Project {
 			} // end preparedstatement
 
 		} catch (SQLException se) {
-			throw new AppException(
-					"dbTasks caught SQLException: " + se.getMessage());
+			throw new AppException("dbTasks caught SQLException: " + se.getMessage());
 		} finally {
 			try {
 				if (connection != null) {
@@ -198,10 +196,8 @@ public class Project2 extends Project {
 		}
 
 		// make sure session_data is text
-		if (session
-				.getAttribute(SessionConstant.SESSION_DATA) instanceof String) {
-			content = (String) session
-					.getAttribute(SessionConstant.SESSION_DATA);
+		if (session.getAttribute(SessionConstant.SESSION_DATA) instanceof String) {
+			content = (String) session.getAttribute(SessionConstant.SESSION_DATA);
 		} else {
 			throw new AppException(
 					SessionConstant.SESSION_DATA + " does not contain text");
@@ -407,13 +403,11 @@ public class Project2 extends Project {
 		try {
 			ScriptEngineManager manager = new ScriptEngineManager();
 			ScriptEngine engine = manager.getEngineByName("javascript");
-			Object ret = engine
-					.eval("print('<tag>" + printMessage + "</tag>')");
+			Object ret = engine.eval("print('<tag>" + printMessage + "</tag>')");
 
 			// make sure data was returned
 			if (ret == null) {
-				throw new AppException(
-						"ScriptEngine in evalScript returned null");
+				throw new AppException("ScriptEngine in evalScript returned null");
 			}
 
 			// return the data but only if the contents are a string
@@ -428,7 +422,7 @@ public class Project2 extends Project {
 			}
 		} catch (ScriptException se) {
 			throw new AppException(
-					"evalScript caugtht ScriptException: " + se.getMessage());
+					"evalScript caught ScriptException: " + se.getMessage());
 		}
 	}
 
@@ -456,8 +450,7 @@ public class Project2 extends Project {
 		// build the XML document from the string content
 		Document doc = null;
 		try {
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			InputSource is = new InputSource(xmlContent);
 			doc = builder.parse(is);

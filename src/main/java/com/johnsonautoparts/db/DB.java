@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 
 import com.johnsonautoparts.exception.DBException;
 import com.johnsonautoparts.logger.AppLogger;
+import com.johnsonautoparts.servlet.ServletUtilities;
 
 public class DB {
 	/*
@@ -30,8 +31,7 @@ public class DB {
 	 * @return Connection
 	 * @throws DBException
 	 **/
-	public static Connection getDbConnection(HttpSession session)
-			throws DBException {
+	public static Connection getDbConnection(HttpSession session) throws DBException {
 		try {
 			// get the context path for the webapp deployment name
 			ServletContext context = session.getServletContext();
@@ -43,12 +43,10 @@ public class DB {
 			// build the connection string to the file in the webapp
 			StringBuilder jdbcStrBuff = new StringBuilder();
 			jdbcStrBuff.append("jdbc:derby:");
-			jdbcStrBuff.append(System.getProperty("catalina.home")
-					+ File.separator + "webapps" + context.getContextPath()
-					+ File.separator + "db");
+			jdbcStrBuff.append(ServletUtilities.getDerbyDbPath(context));
 
-			AppLogger.log(
-					"Initializing Derby DB at path: " + jdbcStrBuff.toString());
+			AppLogger.log("Initializing Derby DB at path: " + jdbcStrBuff.toString());
+
 			// create a connection to the db
 			Connection connection = DriverManager
 					.getConnection(jdbcStrBuff.toString());

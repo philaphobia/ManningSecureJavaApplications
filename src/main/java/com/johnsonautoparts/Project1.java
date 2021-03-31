@@ -1,6 +1,7 @@
 package com.johnsonautoparts;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -58,6 +59,7 @@ public class Project1 extends Project {
 		Matcher matcher = pattern.matcher(str);
 		String cleanStr = str;
 
+
 		// variable str is potentially dirty with HTML or JavaScript tags
 		if (matcher.find()) {
 			cleanStr = str.replaceAll("&", "&amp;").replaceAll("<", "&lt;")
@@ -74,7 +76,7 @@ public class Project1 extends Project {
 	 * TITLE: Avoid leaking data with Format string
 	 * 
 	 * RISK: Attackers could inject formatting strings into variable which the
-	 * application will process and leak
+	 * application will process before the expected formatter and leak data
 	 * 
 	 * REF: CMU Software Engineering Institute IDS06-J
 	 * 
@@ -98,6 +100,8 @@ public class Project1 extends Project {
 	 * For example, text passed as "<scr!ipt>" would bypass a check for
 	 * "<script>" but a later step which then removes the exclamation character
 	 * would then enable the payload as "<script">
+	 *
+	 * Strings should not be modified after validation
 	 * 
 	 * REF: CMU Software Engineering Institute IDS11-J
 	 * 
@@ -116,8 +120,8 @@ public class Project1 extends Project {
 					"Invalid input");
 		}
 
-		// Deletes noncharacter code points
-		return s.replaceAll("[\\p{Cn}]", "");
+		// Deletes exclamation points
+		return s.replaceAll("!", "");
 	}
 
 	/*
@@ -128,14 +132,17 @@ public class Project1 extends Project {
 	 * RISK: An attacker can inject regex into parameters if they know the data
 	 * is inserted in a regex expression. This may lead to leaking of sensitive
 	 * data or bypassing security checks.
-	 * 
+	 *
+	 * The following method allows users to search errors marked as public
+	 * but not filtering out regex could allow a malicious user to bypass the filter.
+	 *
 	 * REF: CMU Software Engineering Institute IDS08-J
 	 * 
 	 * @param search
 	 * @return boolean
 	 */
-	public boolean regularExpression(String search) {
-		String regex = "(.* password\\[\\w+\\]" + search + ".*)";
+	public String searchErrorMessage(String search) {
+		String regex = ".* public user: \\w+ message: .*(" + search + ".*)";
 		Pattern searchPattern = Pattern.compile(regex);
 
 		// retrieve the error even from the session
@@ -144,7 +151,7 @@ public class Project1 extends Project {
 		// make sure data was retrieved from the attribute
 		Object errorEventObject = session.getAttribute("error_event");
 		if (errorEventObject == null) {
-			return false;
+			return null;
 		}
 
 		// make sure the content is a String before comparing
@@ -152,10 +159,16 @@ public class Project1 extends Project {
 			Matcher patternMatcher = searchPattern
 					.matcher(errorEventObject.toString());
 
-			// return boolean result of the find() operation
-			return patternMatcher.find();
+			// return the matching text
+			if (patternMatcher.find() ) {
+				return patternMatcher.group(0);
+			}
+			else {
+				return null;
+			}
+
 		} else {
-			return false;
+			return null;
 		}
 
 	}
@@ -176,8 +189,9 @@ public class Project1 extends Project {
 	 * @return boolean
 	 */
 	public boolean internationalization(String str) throws AppException {
+		System.out.println("\nTOUPPER: " + str.toUpperCase(Locale.ENGLISH) + "\n");
 		// check for script tag
-		if (str.toLowerCase().contains("script")) {
+		if (str.toUpperCase().contains("SCRIPT")) {
 			throw new AppException("internationalization() found script tag");
 		}
 
@@ -218,7 +232,6 @@ public class Project1 extends Project {
 	 */
 	public void logUnsanitizedText(String unsanitizedText) {
 		AppLogger.log("Error: " + unsanitizedText);
-
 	}
 
 	/*
@@ -418,8 +431,8 @@ public class Project1 extends Project {
 	 * @return int
 	 */
 	public int calcTotalValue(int num) {
-		int multiplier = 2;
-		int addedCost = 12;
+		int multiplier = 20;
+		int addedCost = 1147483647;
 
 		int addCost = num + addedCost;
 		int multiCost = num * multiplier;
@@ -448,7 +461,7 @@ public class Project1 extends Project {
 	 * @param monthlyTasks
 	 * @return int
 	 */
-	public int divideTask(int monthlyTasks) {
+	public int divideTask(int monthlyTasks) throws AppException {
 		int monthly = 12;
 
 		return monthly / monthlyTasks;
@@ -476,8 +489,8 @@ public class Project1 extends Project {
 		try {
 			double userInput = Double.parseDouble(num);
 
-			double result = Math.cos(compareTaskId / userInput); // Returns NaN if
-															// input is infinity
+			//returns NaN if input is infinity
+			double result = Math.cos(compareTaskId / userInput);
 
 			// check if we received the expected result
 			return (result == Double.NaN);
@@ -512,8 +525,7 @@ public class Project1 extends Project {
 		if (s.equals("0.001")) {
 			return true;
 		}
-		// string data may be in a slightly different format so perform
-		// additional
+		// string data may be in a slightly different format so perform additional
 		// check if we can match by removing any trailing zeroes
 		else {
 			s = s.replaceFirst("[.0]*$", "");
@@ -525,6 +537,7 @@ public class Project1 extends Project {
 				return false;
 			}
 		}
+
 	}
 
 	/*

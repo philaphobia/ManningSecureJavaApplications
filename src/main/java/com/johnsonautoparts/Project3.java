@@ -294,7 +294,7 @@ public class Project3 extends Project {
 	public String runtimeException(String cmd) throws Exception {
 		try {
 			// execute the OS command
-			if (!Pattern.matches("[0-9A-Za-z]+", cmd)) {
+			if (Pattern.matches("[^0-9A-Za-z]+", cmd)) {
 				throw new RuntimeException(
 						"exec was passed a cmd with illegal characters");
 			}
@@ -319,8 +319,7 @@ public class Project3 extends Project {
 
 			return strBuilder.toString();
 		} catch (RuntimeException re) {
-			throw new Exception(
-					"exec caught runtime error: " + re.getMessage());
+			throw new Exception("exec caught runtime error: " + re.getMessage());
 		} catch (IOException ioe) {
 			throw new Exception("exec caught IO error: " + ioe.getMessage());
 		} catch (InterruptedException ie) {

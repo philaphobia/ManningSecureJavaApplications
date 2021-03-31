@@ -16,17 +16,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @DisplayName("Test your Project4 fixes")
 class TestProject4 {
     private static Project4 project4;
     private static Connection connectionMock;
-
-//    @Mock
-//    private String userDbPath="src/main/webapp/resources/users.xml";
 
     @BeforeEach
     void beforeEach() {
@@ -35,7 +31,7 @@ class TestProject4 {
         HttpServletRequest requestMock = Mockito.mock(HttpServletRequest.class);
         connectionMock = Mockito.mock(Connection.class);
         Mockito.when(requestMock.getSession()).thenReturn(sessionMock);
-        Mockito.when(requestMock.getContextPath()).thenReturn("src/main/webapp");
+        //Mockito.when(requestMock.getContextPath()).thenReturn("src/main/webapp");
 
         //create an instance of the Project4 class
         project4 = new Project4(connectionMock, requestMock, responseMock);
@@ -44,6 +40,8 @@ class TestProject4 {
     @Test
     @DisplayName("Project 4, Milestone 1, Task 1")
     void TestMilestone1Task1() throws AppException {
+        System.out.println("Testing Project4 loginXml()");
+
         String username="user";
         String password="pass";
         String secureForm="<script>"; //task should neutralize the tags
@@ -74,9 +72,101 @@ class TestProject4 {
         assertFalse(retData.matches("\\<script\\>.*"));
     }
 
+    @Test
+    @DisplayName("Project 4, Milestone 1, Task 2")
+    void TestMilestone1Task2() {
+        System.out.println("No Unit test for Milestone 1, Task 2");
+    }
 
+    @Test
+    @DisplayName("Project 4, Milestone 1, Task 3")
+    void TestMilestone1Task3() {
+        System.out.println("No Unit test for Milestone 1, Task 3");
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 1, Task 4")
+    void TestMilestone1Task4() {
+        System.out.println("No Unit test for Milestone 1, Task 4");
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 1, Task 5")
+    void TestMilestone1Task5() {
+        System.out.println("No Unit test for Milestone 1, Task 5");
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 1, Task 6")
+    void TestMilestone1Task6() {
+        System.out.println("No Unit test for Milestone 1, Task 6");
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 2, Task 1")
+    void TestMilestone2Task1() {
+        System.out.println("No Unit test for Milestone 2, Task 1");
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 2, Task 2")
+    void TestMilestone2Task2() {
+        System.out.println("Testing Project4 method addHeader()");
+
+        //example solution for testing if the method only accepts
+        //headers from an allow list. Assuming the following is the
+        //allow list, the method must throw an exception
+        //String[] acceptHeaders = {"distinguish"};
+
+        String notInAllowList = "NOT_distinguished";
+        assertThrows(Exception.class, () -> project4.addHeader(notInAllowList) );
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 2, Task 3")
+    void TestMilestone2Task3() {
+        System.out.println("No Unit test for Milestone 2, Task 3");
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 2, Task 4")
+    void TestMilestone2Task4() {
+        System.out.println("No Unit test for Milestone 2, Task 4");
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 2, Task 5")
+    void TestMilestone2Task5() {
+        System.out.println("Testing Project4 method redirectUser()");
+
+        //example solution for testing if the method only accepts
+        //headers from an allow list. Assuming the following is the
+        //allow list, the method must throw an exception
+        //String[] acceptHeaders = {"distinguish"};
+
+        String notInAcceptList = "http://localhost:8080/NotAValidPath";
+        assertThrows(Exception.class, () -> project4.redirectUser(notInAcceptList) );
+    }
+
+    @Test
+    @DisplayName("Project 4, Milestone 2, Task 6")
+    void TestMilestone2Task6() {
+        System.out.println("No Unit test for Milestone 2, Task 6");
+    }
+
+
+    @Test
+    @DisplayName("Project 4, Milestone 3")
+    void TestMilestone3Task1() {
+        System.out.println("No Unit test for Project4, Milestone 3");
+    }
+
+
+    @Test
+    @DisplayName("Project 4, Milestone 4")
     void TestMilestone4Task1() {
-        System.out.println("No test cases for Project4 yet");
+        System.out.println("No Unit tests for Project4, Milestone 4");
+
     }
 
 }
